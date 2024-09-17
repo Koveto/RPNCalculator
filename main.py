@@ -8,7 +8,7 @@ Kobe Goodwin
 Gabe Wichmann
 
 SD_403_05
-09/14/2024
+09/17/2024
 
 """
 
@@ -16,6 +16,12 @@ SD_403_05
 import tkinter as tk
 from PIL import ImageTk, Image
 import os
+from decimal import *
+
+numX = Decimal("0.0000")        # Number being stored in X
+numY = Decimal("0.0000")        # Number being stored in Y
+
+DIGITS_ON_SCREEN = 19
 
 WIDTH = 338     # Width of screen
 HEIGHT = 615    # Height of screen
@@ -79,8 +85,8 @@ canvas.pack()
 canvas.create_image(WIDTH/2, HEIGHT/2, image=img)
 
 # Create the text
-textY = canvas.create_text(130,140,text="Y: 0.0000", font="terminal 19 bold", fill = "black")
-textX = canvas.create_text(130,170,text="X: 0.0000", font="terminal 19 bold", fill = "black")
+textY = canvas.create_text(45,140,anchor="w",text="Y: 0.0000", font="terminal 17 bold", fill = "black")
+textX = canvas.create_text(45,170,anchor="w",text="X: 0.0000", font="terminal 17 bold", fill = "black")
 
 # Main program
 def main():
@@ -89,6 +95,52 @@ def main():
 
     # Run window
     root.mainloop()
+
+# Formats the X or Y lines around the current number
+def formatNumber( isX ):
+    if isX:
+        numXOrY = numX
+        display = "X: " + str(numXOrY) + "_"
+    else:
+        numXOrY = numY
+        display = "Y: " + str(numXOrY) + "_"
+    if len(display) > 3 + DIGITS_ON_SCREEN:
+        return "..." + str(numXOrY)[len(str(numXOrY)) - DIGITS_ON_SCREEN:] + "_"
+    return display
+    
+# Given a number pressed, update numX and display
+def numberPressed(digit):
+    global numX
+    t = getTextX()
+
+    # A number is already in progress...
+    if "_" in t:
+
+        # "X: 1_" -> "X: 1"
+        sub = t[:len(t) - 1]
+
+        # Decimal found! Figure out how much to add
+        if ("." in str(numX) or sub[len(sub) - 1] == "."):
+            if sub[len(sub) - 1] == ".":
+                begin = len(t)
+            else:
+                begin = str(numX).index(".")
+            end = len(str(numX)) - 1
+            dif = end - begin
+            numX += Decimal("0." + (dif * "0") + str(digit))
+
+        # No decimal. Multiply by ten and add new digit
+        else:
+            numX = (numX * Decimal(10)) + Decimal(str(digit))
+
+        # Update display
+        setTextX(formatNumber(True))
+
+    # New number
+    else:
+        numX = Decimal(str(digit))
+        setTextX(formatNumber(True))
+        
 
 # Sum
 def button1():
@@ -164,15 +216,15 @@ def button18():
 
 # 7
 def button19():
-    print("Button 19 pressed")
+    numberPressed(7)
 
 # 8
 def button20():
-    print("Button 20 pressed")
+    numberPressed(8)
 
 # 9
 def button21():
-    print("Button 21 pressed")
+    numberPressed(9)
 
 # Divison
 def button22():
@@ -184,15 +236,15 @@ def button23():
 
 # 4
 def button24():
-    print("Button 24 pressed")
+    numberPressed(4)
 
 # 5
 def button25():
-    print("Button 25 pressed")
+    numberPressed(5)
 
 # 6
 def button26():
-    print("Button 26 pressed")
+    numberPressed(6)
 
 # Multiplication
 def button27():
@@ -204,15 +256,15 @@ def button28():
 
 # 1
 def button29():
-    print("Button 29 pressed")
+    numberPressed(1)
 
 # 2
 def button30():
-    print("Button 30 pressed")
+    numberPressed(2)
 
 # 3
 def button31():
-    print("Button 31 pressed")
+    numberPressed(3)
 
 # Subtraction
 def button32():
@@ -224,11 +276,30 @@ def button33():
 
 # 0
 def button34():
-    print("Button 34 pressed")
+    numberPressed(0)
 
 # .
 def button35():
-    print("Button 35 pressed")
+    global numX
+    t = getTextX()
+
+    # Can't have decimals in decimals!
+    if "." in t and "_" in t:
+        return
+    
+    # A number is already in progress...
+    if "_" in t:
+        sub = t[:len(t) - 1]
+        # Scroll the display if needed
+        if len(t) < 16:
+            setTextX(sub + "._")
+        else:
+            setTextX(sub[1:] + "._")
+
+    # No number in progress. Start new!
+    else:
+        setTextX("X: 0._")
+        numX = Decimal(0.0)
 
 # R/S
 def button36():
@@ -240,12 +311,20 @@ def button37():
 
 
 # Change the upper text
-def changeTextY(text):
+def setTextY(text):
     canvas.itemconfigure(textY,text=text)
 
+# Get the upper text
+def getTextY():
+    return canvas.itemcget(textY,'text')
+
 # Change the lower text
-def changeTextX(text):
+def setTextX(text):
     canvas.itemconfigure(textX,text=text)
+
+# Get the lower text
+def getTextX():
+    return canvas.itemcget(textX,'text')
 
 # Called when the user clicks
 def click(event):
@@ -258,7 +337,7 @@ def click(event):
             event.y > button[2] and event.y < button[3]):
             break
         else:
-            if i == 37: 
+            if i == len(BUTTONS): 
                 return
     
     # Call appropriate button function
