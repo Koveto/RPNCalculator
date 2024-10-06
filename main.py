@@ -8,7 +8,7 @@ Kobe Goodwin
 Gabe Wichmann
 
 SD_403_05
-10/1/2024
+10/6/2024
 
 """
 
@@ -203,8 +203,8 @@ def button13():
     stack = stack + [numX]
     number = str(stack[len(stack) - 1])
     number = appendZeros(number)
-    setTextY("Y: " + number)
-    setTextX("X: " + number)
+    setTextY("Y: " + number[:DIGITS_ON_SCREEN + 1])
+    setTextX("X: " + number[:DIGITS_ON_SCREEN + 1])
 
 # Comparison
 def button14():
@@ -222,7 +222,6 @@ def button16():
 def button17():
     global numX
     if "_" in getTextX():
-        setTextX(getTextX()[:len(getTextX()) - 2] + "_")
         digit = str(numX)[len(str(numX)) - 1]
         if "." in str(numX):
             if str(numX)[len(str(numX)) - 1] == ".":
@@ -231,11 +230,33 @@ def button17():
                 begin = str(numX).index(".")
             end = len(str(numX)) - 1
             dif = end - begin
-            temp = Decimal(dif) * Decimal(Decimal(1) / Decimal(10))
+            temp = Decimal(1) * (Decimal(10) ** (Decimal(-1) * Decimal(dif)))
             temp = Decimal(int(digit)) * Decimal(temp)
             numX = Decimal(numX) - Decimal(temp)
+            numX = Decimal(str(numX).rstrip("0"))
         else:
             numX = Decimal(Decimal(Decimal(numX) - Decimal(int(digit))) / Decimal(10))
+
+        if ("..." not in getTextX()):
+            setTextX(getTextX()[:len(getTextX()) - 2] + "_")
+        else:
+            t = getTextX()[3:]
+            n = str(numX)[:len(str(numX)) - DIGITS_ON_SCREEN]
+            if len(n) == 0:
+                setTextX("X: " + str(numX) + "_")
+            else:
+                if "." not in n and "." not in t:
+                    t = "." + t
+                else:
+                    t = n[len(n) - 1] + t
+                if (t[:len(t) - 2] == str(numX)):
+                    setTextX("X: " + t[:len(t) - 2] + "_")
+                else:
+                    setTextX("..." + t[:len(t) - 2] + "_")
+        
+        print(getTextX())
+        print("   " + str(numX))
+        print()
     else:
         numX = 0
         setTextX("X: 0.0000")
