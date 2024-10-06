@@ -228,6 +228,7 @@ def button17():
         stack = []
         setTextX("X: 0.0000")
         setTextY("Y: 0.0000")
+        ORANGE = not ORANGE
         return
     
     if "_" in getTextX():
