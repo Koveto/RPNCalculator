@@ -25,6 +25,8 @@ numY = Decimal("0.0000")        # Number being stored in Y
 
 DIGITS_ON_SCREEN = 19
 
+ORANGE = False
+
 WIDTH = 338     # Width of screen
 HEIGHT = 615    # Height of screen
 #           Left, Right, Top, Bottom
@@ -220,7 +222,14 @@ def button16():
 
 # Backspace
 def button17():
-    global numX
+    global numX, stack
+
+    if ORANGE:
+        stack = []
+        setTextX("X: 0.0000")
+        setTextY("Y: 0.0000")
+        return
+    
     if "_" in getTextX():
         digit = str(numX)[len(str(numX)) - 1]
         if "." in str(numX):
@@ -253,10 +262,6 @@ def button17():
                     setTextX("X: " + t[:len(t) - 2] + "_")
                 else:
                     setTextX("..." + t[:len(t) - 2] + "_")
-        
-        print(getTextX())
-        print("   " + str(numX))
-        print()
     else:
         numX = 0
         setTextX("X: 0.0000")
@@ -319,7 +324,8 @@ def button27():
 
 # Orange
 def button28():
-    print("Button 28 pressed")
+    global ORANGE
+    ORANGE = not ORANGE
 
 # 1
 def button29():
@@ -402,9 +408,9 @@ def pop():
 # Append extra 0s to a number "3" -> "3.0000"
 def appendZeros(text):
     if len(text) < 4 and "." not in text:
-        text += "." + ("0" * (4 - len(text)))
+        text += "." + ("0" * (5 - len(text)))
     elif len(text) < 4:
-        text += "0" * (4 - len(text))
+        text += "0" * (5 - len(text))
     return text
 
 # Change the upper text
