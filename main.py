@@ -222,7 +222,7 @@ def button16():
 
 # Backspace
 def button17():
-    global numX, stack
+    global numX, stack, ORANGE
 
     if ORANGE:
         stack = []
