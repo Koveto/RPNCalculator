@@ -292,10 +292,10 @@ def button22():
         pop()
     num1 = Decimal(pop())
     num2 = Decimal(pop())
-    if num2 == 0:
+    if num1 == 0:
         setTextY("Divide By Zero")
     else:
-        number = num1 /  num2
+        number = num2 /  num1
         pushOperation(number)
 
 # Down
