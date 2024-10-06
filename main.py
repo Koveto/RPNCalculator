@@ -417,20 +417,20 @@ def button35():
     t = getTextX()
 
     # Can't have decimals in decimals!
-    if "." in t and "_" in t:
+    if "." in str(numX) and "_" in t:
         return
     
     # A number is already in progress...
     if "_" in t:
         sub = t[:len(t) - 1]
         # Scroll the display if needed
-        if len(t) < 16:
+        if len(t) < DIGITS_ON_SCREEN - 3:
             setTextX(sub + "._")
         else:
-            setTextX(sub[1:] + "._")
+            setTextX("..." + sub[4:] + "._")
 
     # No number in progress. Start new!
-    else:
+    else:  
         setTextX("X: 0._")
         numX = Decimal(0.0)
 
