@@ -449,7 +449,7 @@ to the stack. Calculates
 number = (-1 * firstPop) + secondPop()
 Calls pushOperation(number) to update the stack and display. 
 """
-def addition(MinusOneForSubtraction):
+def addition(Z):
     global stack
     if "_" in getTextX():
         button13()
