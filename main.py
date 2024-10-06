@@ -8,7 +8,7 @@ Kobe Goodwin
 Gabe Wichmann
 
 SD_403_05
-09/17/2024
+10/1/2024
 
 """
 
@@ -17,6 +17,8 @@ import tkinter as tk
 from PIL import ImageTk, Image
 import os
 from decimal import *
+
+stack = []
 
 numX = Decimal("0.0000")        # Number being stored in X
 numY = Decimal("0.0000")        # Number being stored in Y
@@ -138,6 +140,9 @@ def numberPressed(digit):
 
     # New number
     else:
+        number = str(Decimal(peek()))
+        number = appendZeros(number)
+        setTextY("Y: " + number)
         numX = Decimal(str(digit))
         setTextX(formatNumber(True))
         
@@ -192,7 +197,14 @@ def button12():
 
 # Enter
 def button13():
-    print("Button 13 pressed")
+    global stack
+    global numX
+    stack = stack + [numX]
+    stack = stack + [numX]
+    number = str(stack[len(stack) - 1])
+    number = appendZeros(number)
+    setTextY("Y: " + number)
+    setTextX("X: " + number)
 
 # Comparison
 def button14():
@@ -208,7 +220,26 @@ def button16():
 
 # Backspace
 def button17():
-    print("Button 17 pressed")
+    global numX
+    if "_" in getTextX():
+        setTextX(getTextX()[:len(getTextX()) - 2] + "_")
+        digit = str(numX)[len(str(numX)) - 1]
+        if "." in str(numX):
+            if str(numX)[len(str(numX)) - 1] == ".":
+                begin = len(getTextX())
+            else:
+                begin = str(numX).index(".")
+            end = len(str(numX)) - 1
+            dif = end - begin
+            temp = Decimal(dif) * Decimal(Decimal(1) / Decimal(10))
+            temp = Decimal(int(digit)) * Decimal(temp)
+            numX = Decimal(numX) - Decimal(temp)
+        else:
+            numX = Decimal(Decimal(Decimal(numX) - Decimal(int(digit))) / Decimal(10))
+    else:
+        numX = 0
+        setTextX("X: 0.0000")
+
 
 # Up
 def button18():
@@ -228,7 +259,17 @@ def button21():
 
 # Divison
 def button22():
-    print("Button 22 pressed")
+    global stack
+    if "_" in getTextX():
+        button13()
+        pop()
+    num1 = Decimal(pop())
+    num2 = Decimal(pop())
+    if num2 == 0:
+        setTextY("Divide By Zero")
+    else:
+        number = num1 /  num2
+        pushOperation(number)
 
 # Down
 def button23():
@@ -248,7 +289,12 @@ def button26():
 
 # Multiplication
 def button27():
-    print("Button 27 pressed")
+    global stack
+    if "_" in getTextX():
+        button13()
+        pop()
+    number = Decimal(pop()) *  Decimal(pop())
+    pushOperation(number)
 
 # Orange
 def button28():
@@ -268,7 +314,7 @@ def button31():
 
 # Subtraction
 def button32():
-    print("Button 32 pressed")
+    addition(-1)
 
 # Exit
 def button33():
@@ -307,8 +353,38 @@ def button36():
 
 # Addition
 def button37():
-    print("Button 37 pressed")
+    addition(1)
 
+# Add two numbers
+def addition(MinusOneForSubtraction):
+    global stack
+    if "_" in getTextX():
+        button13()
+        pop()
+    number = (Decimal(MinusOneForSubtraction) * Decimal(pop())) +  Decimal(pop())
+    pushOperation(number)
+
+# Get the number from the top of the stack
+def peek():
+    if stack == []:
+        return 0
+    else:
+        return stack[len(stack) - 1]
+    
+# Get the number from the top of the stack and remove it
+def pop():
+    if stack == []:
+        return 0
+    else:
+        return stack.pop()
+    
+# Append extra 0s to a number "3" -> "3.0000"
+def appendZeros(text):
+    if len(text) < 4 and "." not in text:
+        text += "." + ("0" * (4 - len(text)))
+    elif len(text) < 4:
+        text += "0" * (4 - len(text))
+    return text
 
 # Change the upper text
 def setTextY(text):
@@ -325,6 +401,21 @@ def setTextX(text):
 # Get the lower text
 def getTextX():
     return canvas.itemcget(textX,'text')
+
+# Put the top two numbers in stack to X and Y
+def pushOperation(number):
+    global stack
+    temp = str(peek())
+    if len(temp) > 19:
+        temp = temp[:19]
+    temp = appendZeros(temp)
+    setTextY("Y: " + temp)
+    temp = str(number)
+    if len(temp) > 19:
+        temp = temp[:19]
+    temp = appendZeros(temp)
+    setTextX("X: " + temp)
+    stack = stack + [Decimal(number)]
 
 # Called when the user clicks
 def click(event):
