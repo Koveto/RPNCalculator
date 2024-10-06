@@ -1,6 +1,7 @@
 """
 
 Reverse Polish Notation (RPN) Calculator
+Window application proof-of-concept
 
 Contributors:
 Kale Erickson
@@ -93,6 +94,9 @@ textY = canvas.create_text(45,140,anchor="w",text="Y: 0.0000", font="terminal 17
 textX = canvas.create_text(45,170,anchor="w",text="X: 0.0000", font="terminal 17 bold", fill = "black")
 
 # Main program
+"""
+Display the 338x615 window, show a HP-42S background, and repeatedly check for a click. 
+"""
 def main():
     # Click activates function
     canvas.bind("<Button-1>", click)
@@ -101,6 +105,12 @@ def main():
     root.mainloop()
 
 # Formats the X or Y lines around the current number
+"""
+Takes boolean, True for X and False for Y. Returns output
+to be displayed on X or Y in the form "X: {number}_" where
+number is numX or numY. If the number is too long, "X. "
+is replaced with "…" and the number is cropped. 
+"""
 def formatNumber( isX ):
     if isX:
         numXOrY = numX
@@ -113,6 +123,14 @@ def formatNumber( isX ):
     return display
     
 # Given a number pressed, update numX and display
+"""
+Takes a single number 0-9. Where no underscore is
+displayed, it starts a new number. Otherwise, it
+determines how much to add to the existing number
+depending on the decimal place. It updates the display
+and calls formatNumber(True). Calls peek() to put the
+top of the stack in Y. 
+"""
 def numberPressed(digit):
     global numX
     t = getTextX()
@@ -198,12 +216,18 @@ def button12():
     print("Button 12 pressed")
 
 # Enter
+"""
+"Enter" button. Adds the existing number to the top (end)
+of stack twice. Updates display so X and Y show the top
+two numbers (which are the same) on the stack. Calls
+appendZeros(number) to format the number. 
+"""
 def button13():
     global stack
     global numX
     stack = stack + [numX]
     stack = stack + [numX]
-    number = str(stack[len(stack) - 1])
+    number = str(peek())
     number = appendZeros(number)
     setTextY("Y: " + number[:DIGITS_ON_SCREEN + 1])
     setTextX("X: " + number[:DIGITS_ON_SCREEN + 1])
@@ -221,6 +245,17 @@ def button16():
     print("Button 16 pressed")
 
 # Backspace
+"""
+"Backspace"/"Clear" button. If ORANGE, the stack is emptied.
+Backspace clears the X register if a number isn't in progress
+Where n is the digit being removed, 
+X = (X – n) / 10 
+if no decimal exists. If a decimal exists, let d be the distance
+between the decimal place and n. Then,
+X = X - (n * 10^(-1 * d))
+Displays the new number on screen. Handles screen wrapping for
+numbers beyond DIGITS_ON_SCREEN. 
+"""
 def button17():
     global numX, stack, ORANGE
 
@@ -264,6 +299,7 @@ def button17():
                 else:
                     setTextX("..." + t[:len(t) - 2] + "_")
     else:
+        pop()
         numX = 0
         setTextX("X: 0.0000")
 
@@ -285,6 +321,14 @@ def button21():
     numberPressed(9)
 
 # Divison
+"""
+"Divide" button. Calls button13() and pop() to add the current
+number (if any) once to the stack. Pops the top two numbers
+from the stack so num1 is the first pop and num2 is the second
+pop. Attempts to perform num2 / num1. Displays "Divide By Zero"
+to Y if num1 is 0. If successful, calls pushOperation(number)
+to update the stack and display. 
+"""
 def button22():
     global stack
     if "_" in getTextX():
@@ -315,6 +359,12 @@ def button26():
     numberPressed(6)
 
 # Multiplication
+"""
+"Multiply" button. Calls button13() and pop() to add the
+current number (if any) once to the stack. Pops twice
+from the stack and multiplies. Calls pushOperation(number)
+to update the stack and display. 
+"""
 def button27():
     global stack
     if "_" in getTextX():
@@ -324,6 +374,9 @@ def button27():
     pushOperation(number)
 
 # Orange
+"""
+"Orange" button. Inverts the global ORANGE variable.
+"""
 def button28():
     global ORANGE
     ORANGE = not ORANGE
@@ -353,6 +406,12 @@ def button34():
     numberPressed(0)
 
 # .
+"""
+Decimal button. Does nothing if a number is being input and already
+has a decimal place. Starts a new number at "0._" if no number is
+being input. Otherwise, adds "._" to the display and scrolls if
+necessary. 
+"""
 def button35():
     global numX
     t = getTextX()
@@ -384,6 +443,12 @@ def button37():
     addition(1)
 
 # Add two numbers
+"""
+Calls button13() and pop() to add the current number (if any) once
+to the stack. Calculates
+number = (-1 * firstPop) + secondPop()
+Calls pushOperation(number) to update the stack and display. 
+"""
 def addition(MinusOneForSubtraction):
     global stack
     if "_" in getTextX():
@@ -393,6 +458,9 @@ def addition(MinusOneForSubtraction):
     pushOperation(number)
 
 # Get the number from the top of the stack
+"""
+Return 0 if stack is empty. Return top of the stack. 
+"""
 def peek():
     if stack == []:
         return 0
@@ -400,6 +468,10 @@ def peek():
         return stack[len(stack) - 1]
     
 # Get the number from the top of the stack and remove it
+"""
+Return 0 if stack is empty. Remove item from the top of
+the stack and return it. 
+"""
 def pop():
     if stack == []:
         return 0
@@ -407,6 +479,9 @@ def pop():
         return stack.pop()
     
 # Append extra 0s to a number "3" -> "3.0000"
+"""
+Add zeros to the end of the text so there are at least four decimal places. 
+"""
 def appendZeros(text):
     if len(text) < 4 and "." not in text:
         text += "." + ("0" * (5 - len(text)))
@@ -414,6 +489,9 @@ def appendZeros(text):
         text += "0" * (5 - len(text))
     return text
 
+"""
+Mutator and accessor methods for tkinter canvas items. 
+"""
 # Change the upper text
 def setTextY(text):
     canvas.itemconfigure(textY,text=text)
@@ -431,6 +509,10 @@ def getTextX():
     return canvas.itemcget(textX,'text')
 
 # Put the top two numbers in stack to X and Y
+"""
+Update Y and X using peek(), trimming the number, and appendZeros().
+Add the number to the top of the stack. 
+"""
 def pushOperation(number):
     global stack
     temp = str(peek())
@@ -446,6 +528,10 @@ def pushOperation(number):
     stack = stack + [Decimal(number)]
 
 # Called when the user clicks
+"""
+Tkinter method implementation. It determines which button is being 
+pressed using an array of constants and calls the respective method. 
+"""
 def click(event):
 
     # Determine which button is being pressed, if any
