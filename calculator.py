@@ -42,6 +42,7 @@ key_list = [["1", "2", "3"],\
 button1 = Pin(16, Pin.IN, Pin.PULL_UP)
 button2 = Pin(17, Pin.IN)
 button3 = Pin(18, Pin.IN)
+button4 = Pin(19, Pin.IN)
 
 """
 Check buttons. Scan the keypad.
@@ -62,6 +63,10 @@ def getKey(col, row):
         sleep(0.1)
         if (button3.value() == 0):
             return "C"
+    if (button4.value() == 0):
+        sleep(0.1)
+        if (button4.value() == 0):
+            return "D"
     
     # col = [GP4, GP5, GP6] Input Pins
     # row = [GP0, GP1, GP2, GP3] Output Pins
@@ -305,6 +310,13 @@ def pushOperation(number):
     temp = appendZeros(temp)
     textX = "X: " + temp
     stack = stack + [number]
+    
+"""
+"Orange" button. Inverts the global ORANGE variable.
+"""
+def orange():
+    global ORANGE
+    ORANGE = not ORANGE
 
 """
 Given a number pressed, call the appropriate
@@ -317,6 +329,8 @@ def interpretPress( key ):
         addition(1)
     if (key == "C"):
         addition(-1)
+    if (key == "D"):
+        orange()
     if (key == "1"):
         numberPressed(1)
     if (key == "2"):
