@@ -454,7 +454,7 @@ def addition(Z):
     if "_" in getTextX():
         button13()
         pop()
-    number = (Decimal(MinusOneForSubtraction) * Decimal(pop())) +  Decimal(pop())
+    number = (Decimal(Z) * Decimal(pop())) +  Decimal(pop())
     pushOperation(number)
 
 # Get the number from the top of the stack
