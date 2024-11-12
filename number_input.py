@@ -11,11 +11,14 @@ GP16-18 -> K1-K3
 
 from machine import Pin
 from time import sleep
+import cmath
 
-num = 0.0000
+num = 0   # real
+num1 = 0  # imag
 
 decimal = 0
 exp = False
+compl = False
 
 row_list = [0, 1, 2, 3]  
 col_list = [4, 5, 6]
@@ -85,15 +88,21 @@ def getKey(col, row):
 
 
 def numberPressed( number ):
-    global num, decimal, exp
+    global num, num1, decimal, compl, exp
     if exp:
         num = num * (10 ** (number))
         exp = False
     else:
         if decimal == 0:
-            num = 10*num + number
+            if not compl:
+                num = 10*num + number
+            else:
+                num1 = 10*num1 + number
         else:
-            num = num + (number * (10**(-decimal)))
+            if not compl:
+                num = num + (number * (10**(-decimal)))
+            else:
+                num1 = num1 + (number * (10**(-decimal)))
             decimal += 1
 
 def decimalPoint( ):
@@ -101,22 +110,31 @@ def decimalPoint( ):
     if (decimal == 0):
         decimal = 1
 
-def clear( ):
-    global num, decimal
-    num = 0
+def exponent( ):
+    global exp
+    exp = True
+    
+def complexN( ):
+    global decimal, compl
+    compl = True
     decimal = 0
+
+def clear( ):
+    global num, num1, compl, decimal
+    num = 0
+    num1 = 0
+    decimal = 0
+    compl = False
 
 """
 Given a number pressed, call the appropriate
 function.
 """
 def interpretPress( key ):
-    global exp
     if (key == "A"):
-        exp = True
-        print(exp)
+        exponent()
     if (key == "B"):
-        print()
+        complexN()
     if (key == "C"):
         print()
     if (key == "D"):
@@ -166,7 +184,10 @@ def main():
         # A new key is pressed
         if key != None and key != lastKey:
             interpretPress(key)
-            print("\n" + str(num))
+            if (num1 == 0):
+                print("\n" + str(num))
+            else:
+                print("\n" + str(num) + " + j" + str(num1))
             lastKey = key
             
         # A key was released
