@@ -15,6 +15,7 @@ from time import sleep
 num = 0.0000
 
 decimal = 0
+exp = False
 
 row_list = [0, 1, 2, 3]  
 col_list = [4, 5, 6]
@@ -84,12 +85,16 @@ def getKey(col, row):
 
 
 def numberPressed( number ):
-    global num, decimal
-    if decimal == 0:
-        num = 10*num + number
+    global num, decimal, exp
+    if exp:
+        num = num * (10 ** (number))
+        exp = False
     else:
-        num = num + (number * (10**(-decimal)))
-        decimal += 1
+        if decimal == 0:
+            num = 10*num + number
+        else:
+            num = num + (number * (10**(-decimal)))
+            decimal += 1
 
 def decimalPoint( ):
     global decimal
@@ -106,8 +111,10 @@ Given a number pressed, call the appropriate
 function.
 """
 def interpretPress( key ):
+    global exp
     if (key == "A"):
-        print()
+        exp = True
+        print(exp)
     if (key == "B"):
         print()
     if (key == "C"):
