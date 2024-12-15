@@ -37,10 +37,18 @@ key_list = [["1", "2", "3"],\
             ["7", "8", "9"],\
             ["*", "0", "#"]]
 
-button1 = Pin(16, Pin.IN, Pin.PULL_UP)
-button2 = Pin(17, Pin.IN)
-button3 = Pin(18, Pin.IN)
-button4 = Pin(19, Pin.IN)
+buttonA = Pin(19, Pin.IN, Pin.PULL_UP)
+buttonB = Pin(18, Pin.IN)
+buttonC = Pin(17, Pin.IN)
+buttonD = Pin(16, Pin.IN)
+buttonE = Pin(20, Pin.IN)
+buttonF = Pin(21, Pin.IN)
+buttonG = Pin(22, Pin.IN)
+buttonH = Pin(26, Pin.IN)
+buttonI = Pin(27, Pin.IN)
+buttonJ = Pin(28, Pin.IN)																																		
+buttonK = Pin(15, Pin.IN)
+buttonL = Pin(14, Pin.IN)
 
 """
 Check buttons. Scan the keypad.
@@ -49,22 +57,54 @@ Get the key or button pressed.
 def getKey(col, row):
     
     # Check buttons. Wait for debouncing.
-    if (button1.value() == 0):
+    if (buttonA.value() == 0):
         sleep(0.1)
-        if (button1.value() == 0):
+        if (buttonA.value() == 0):
             return "A"
-    if (button2.value() == 0):
+    if (buttonB.value() == 0):
         sleep(0.1)
-        if (button2.value() == 0):
+        if (buttonB.value() == 0):
             return "B"
-    if (button3.value() == 0):
+    if (buttonC.value() == 0):
         sleep(0.1)
-        if (button3.value() == 0):
+        if (buttonC.value() == 0):
             return "C"
-    if (button4.value() == 0):
+    if (buttonD.value() == 0):
         sleep(0.1)
-        if (button4.value() == 0):
+        if (buttonD.value() == 0):
             return "D"
+    if (buttonE.value() == 0):
+        sleep(0.1)
+        if (buttonE.value() == 0):
+            return "E"
+    if (buttonF.value() == 0):
+        sleep(0.1)
+        if (buttonF.value() == 0):
+            return "F"
+    if (buttonG.value() == 0):
+        sleep(0.1)
+        if (buttonG.value() == 0):
+            return "G"
+    if (buttonH.value() == 0):
+        sleep(0.1)
+        if (buttonH.value() == 0):
+            return "H"
+    if (buttonI.value() == 0):
+        sleep(0.1)
+        if (buttonI.value() == 0):
+            return "I"
+    if (buttonJ.value() == 0):
+        sleep(0.1)
+        if (buttonJ.value() == 0):
+            return "J"
+    if (buttonK.value() == 0):
+        sleep(0.1)
+        if (buttonK.value() == 0):
+            return "K"
+    if (buttonL.value() == 0):
+        sleep(0.1)
+        if (buttonL.value() == 0):
+            return "L"
     
     # col = [GP4, GP5, GP6] Input Pins
     # row = [GP0, GP1, GP2, GP3] Output Pins
@@ -132,13 +172,31 @@ function.
 """
 def interpretPress( key ):
     if (key == "A"):
-        exponent()
+        #exponent()
+        print("A")
     if (key == "B"):
-        complexN()
+        #complexN()
+        print("B")
     if (key == "C"):
-        print()
+        print("C")
     if (key == "D"):
-        print()
+        print("D")
+    if (key == "E"):
+        print("E")
+    if (key == "F"):
+        print("F")
+    if (key == "G"):
+        print("G")
+    if (key == "H"):
+        print("H")
+    if (key == "I"):
+        print("I")
+    if (key == "J"):
+        print("J")
+    if (key == "K"):
+        print("K")
+    if (key == "L"):
+        print("L")
     if (key == "1"):
         numberPressed(1)
     if (key == "2"):
@@ -174,7 +232,7 @@ def main():
     lastKey = None
     
     # Display
-    print("\n" + str(num))
+    #```````````````````````````````````````````````````````````````````````````````gggggggggggggggggggg print("\n" + str(num))
     
     while(True):
         
@@ -184,10 +242,10 @@ def main():
         # A new key is pressed
         if key != None and key != lastKey:
             interpretPress(key)
-            if (num1 == 0):
-                print("\n" + str(num))
-            else:
-                print("\n" + str(num) + " + j" + str(num1))
+            #if (num1 == 0):
+            #    print()#hprint("\n" + str(num))
+            #else:
+            #    print("\n" + str(num) + " + j" + str(num1))
             lastKey = key
             
         # A key was released
