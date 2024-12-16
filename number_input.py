@@ -6,19 +6,26 @@ Reverse Polish Notation (RPN) Calculator
 Raspberry-Pi Pico program
 
 GP0-6 -> 4x3 Keypad (0 to leftmost i/o)
-GP16-18 -> K1-K3
+GP16-19 -> K4-K1
+GP20-22 -> Breadboard E-G
+GP26-28 -> Breadboard H-J
+GP14-15 -> Breadboard L-K
+Power and ground the breadboard
 """
 
 from machine import Pin
 from time import sleep
 import cmath
 
-num = 0   # real
-num1 = 0  # imag
+numReal = 0   # real
+numImag = 0  # imag
+
+stackReal = []
+stackImag = []
 
 decimal = 0
-exp = False
 compl = False
+isPolar = False
 
 row_list = [0, 1, 2, 3]  
 col_list = [4, 5, 6]
@@ -46,7 +53,7 @@ buttonF = Pin(21, Pin.IN)
 buttonG = Pin(22, Pin.IN)
 buttonH = Pin(26, Pin.IN)
 buttonI = Pin(27, Pin.IN)
-buttonJ = Pin(28, Pin.IN)																																		
+buttonJ = Pin(28, Pin.IN)
 buttonK = Pin(15, Pin.IN)
 buttonL = Pin(14, Pin.IN)
 
@@ -128,22 +135,84 @@ def getKey(col, row):
 
 
 def numberPressed( number ):
-    global num, num1, decimal, compl, exp
-    if exp:
-        num = num * (10 ** (number))
-        exp = False
-    else:
-        if decimal == 0:
-            if not compl:
-                num = 10*num + number
-            else:
-                num1 = 10*num1 + number
+    global numReal, numImag, decimal, comp
+    if decimal == 0:
+        if not compl:
+            numReal = 10*numReal + number
         else:
-            if not compl:
-                num = num + (number * (10**(-decimal)))
-            else:
-                num1 = num1 + (number * (10**(-decimal)))
-            decimal += 1
+            numImag = 10*numImag + number
+    else:
+        if not compl:
+            numReal = numReal + (number * (10**(-decimal)))
+        else:
+            numImag = numImag + (number * (10**(-decimal)))
+        decimal += 1
+
+def add( negative ):
+    global numReal, numImag
+    n = pop()
+    nReal = n[0]
+    nImag = n[1]
+    y = 1j*(nImag) + nReal
+    z = 1j*(numImag) + numReal
+    if negative:
+        a = y - z
+    else:
+        a = y + z
+    numReal = a.real
+    numImag = a.imag
+    
+def multiply( ):
+    global numReal, numImag
+    n = pop()
+    nReal = n[0]
+    nImag = n[1]
+    y = 1j*(nImag) + nReal
+    z = 1j*(numImag) + numReal
+    a = y * z
+    numReal = a.real
+    numImag = a.imag
+
+def divide( ):
+    global numReal, numImag
+    if (numReal == 0 and numImag == 0):
+        return
+    n = pop()
+    nReal = n[0]
+    nImag = n[1]
+    y = 1j*(nImag) + nReal
+    z = 1j*(numImag) + numReal
+    a = y / z
+    numReal = a.real
+    numImag = a.imag
+    
+def power( ):
+    global numReal, numImag
+    n = pop()
+    nReal = n[0]
+    nImag = n[1]
+    y = 1j*(nImag) + nReal
+    z = 1j*(numImag) + numReal
+    #print(str(y) + "," + str(z))
+    a = y ** z
+    numReal = a.real
+    numImag = a.imag
+    
+def invert( ):
+    global numReal, numImag
+    if (numReal == 0 and numImag == 0):
+        return
+    y = 1j*(numImag) + numReal
+    a = 1 / y
+    numReal = a.real
+    numImag = a.imag
+    
+def negative( ):
+    global numReal, numImag
+    y = 1j*(numImag) + numReal
+    a = y * -1
+    numReal = a.real
+    numImag = a.imag
 
 def decimalPoint( ):
     global decimal
@@ -151,20 +220,116 @@ def decimalPoint( ):
         decimal = 1
 
 def exponent( ):
-    global exp
-    exp = True
+    global numReal, numImag
+    n = pop()
+    nReal = n[0]
+    nImag = n[1]
+    y = 1j*(nImag) + nReal
+    z = 1j*(numImag) + numReal
+    #r = 
+    #theta = cmath.phase(z)
+    a = y * (10 ** z)
+    numReal = a.real
+    numImag = a.imag
+    
+def polar( ):
+    global isPolar
+    isPolar = not isPolar
     
 def complexN( ):
     global decimal, compl
-    compl = True
+    compl = not compl
     decimal = 0
 
-def clear( ):
-    global num, num1, compl, decimal
-    num = 0
-    num1 = 0
+def push( ):
+    global stackReal, stackImag, numReal, numImag, decimal, compl
+    stackReal = stackReal + [numReal]
+    stackImag = stackImag + [numImag]
+    numReal = 0
+    numImag = 0
     decimal = 0
     compl = False
+    
+def pop( ):
+    global stackReal, stackImag
+    if (len(stackReal) == 0):
+        return [0, 0]
+    r = stackReal[-1]
+    i = stackImag[-1]
+    del stackReal[-1]
+    del stackImag[-1]
+    return [r, i]
+
+def peek( ):
+    return [stackReal[-1], stackImag[-1]]
+
+def back( ):
+    global numReal, numImag, compl, decimal
+    if (compl == True and decimal == 0):
+        numImag = int(numImag) // 10
+    if (compl == False and decimal == 0):
+        numReal = int(numReal) // 10
+    else:
+        numReal = 0
+        numImag = 0
+        decimal = 0
+        compl = False
+
+def clear( ):
+    global numReal, numImag, stackReal, stackImag, compl, decimal
+    numReal = 0
+    numImag = 0
+    decimal = 0
+    stackReal = []
+    stackImag = []
+    compl = False
+    
+def display( ):
+    #print("D:" + str(numImag))
+    if (len(stackReal) == 0):
+        print("\n0")
+    else:
+        if (stackImag[-1] == 0):
+            print("\n" + str(stackReal[-1]))
+        else:
+            if isPolar:
+                z = stackReal[-1] + 1j*(stackImag[-1])
+                a = cmath.sqrt((z.real ** 2) + (z.imag ** 2)).real
+                b = cmath.phase(z)
+            else:
+                a = stackReal[-1]
+                b = stackImag[-1]
+            if (str(b)[0] != "-"):
+                neg = "+"
+                nm = 1
+            else:
+                neg = "-"
+                nm = -1
+            print("\n" + str(a) + " " + neg + " j" + str(b*nm))
+    if (decimal == 1):
+        dec = "."
+    else:
+        dec = ""
+    if (numImag == 0 and compl == False):
+        print(str(numReal) + dec)
+    else:
+        if isPolar:
+            z = numReal + 1j*(numImag)
+            a = cmath.sqrt((z.real ** 2) + (z.imag ** 2)).real
+            b = cmath.phase(z)
+        else:
+            a = numReal
+            b = numImag
+        if (str(b)[0] != "-"):
+            neg = "+"
+            nm = 1
+        else:
+            neg = "-"
+            nm = -1
+        if (compl == False):
+            print(str(a) + dec + " " + neg + " j" + str(b*nm))
+        else:
+            print(str(a) + " " + neg + " j" + str(b*nm) + dec)
 
 """
 Given a number pressed, call the appropriate
@@ -172,31 +337,41 @@ function.
 """
 def interpretPress( key ):
     if (key == "A"):
-        #exponent()
-        print("A")
+        exponent()
+        #print("A")
     if (key == "B"):
-        #complexN()
-        print("B")
+        complexN()
+        #print("B")
     if (key == "C"):
-        print("C")
+        push()
+        #print("C")
     if (key == "D"):
-        print("D")
+        decimalPoint()
+        #print("D")
     if (key == "E"):
-        print("E")
+        add(False)
+        #print("E")
     if (key == "F"):
-        print("F")
+        add(True)
+        #print("F")
     if (key == "G"):
-        print("G")
+        multiply()
+        #print("G")
     if (key == "H"):
-        print("H")
+        divide()
+        #print("H")
     if (key == "I"):
-        print("I")
+        power()
+        #print("I")
     if (key == "J"):
-        print("J")
+        polar()
+        #print("J")
     if (key == "K"):
-        print("K")
+        invert()
+        #print("K")
     if (key == "L"):
-        print("L")
+        negative()
+        #print("L")
     if (key == "1"):
         numberPressed(1)
     if (key == "2"):
@@ -216,7 +391,7 @@ def interpretPress( key ):
     if (key == "9"):
         numberPressed(9)
     if (key == "*"):
-        decimalPoint()
+        back()
     if (key == "0"):
         numberPressed(0)
     if (key == "#"):
@@ -232,7 +407,7 @@ def main():
     lastKey = None
     
     # Display
-    #```````````````````````````````````````````````````````````````````````````````gggggggggggggggggggg print("\n" + str(num))
+    print("0\n0")
     
     while(True):
         
@@ -242,10 +417,7 @@ def main():
         # A new key is pressed
         if key != None and key != lastKey:
             interpretPress(key)
-            #if (num1 == 0):
-            #    print()#hprint("\n" + str(num))
-            #else:
-            #    print("\n" + str(num) + " + j" + str(num1))
+            display()
             lastKey = key
             
         # A key was released
