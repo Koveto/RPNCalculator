@@ -19,7 +19,7 @@ led2 = Pin(21, Pin.OUT)
 led3 = Pin(22, Pin.OUT)
 led4 = Pin(26, Pin.OUT)
 
-button1 = Pin(19, Pin.IN, Pin.PULL_UP)
+button1 = Pin(15, Pin.IN, Pin.PULL_UP)
 def button1Pressed(button1):
     sleep(0.1)
     if (button1.value() == 0):

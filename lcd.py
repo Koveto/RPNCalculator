@@ -21,7 +21,7 @@ Code from https://www.circuitschools.com/interfacing-16x2-lcd-module-with-raspbe
 from machine import Pin
 from gpio_lcd import GpioLcd
 
-class Lcd_Screen:
+class Lcd:
     def __init__(self, col, row, Rs, E, D4, D5, D6, D7):
         self.lcd = GpioLcd(rs_pin=Pin(Rs),
               enable_pin=Pin(E),
@@ -31,9 +31,9 @@ class Lcd_Screen:
               d7_pin=Pin(D7),
               num_lines=row, num_columns=col)
     
-    def cursor_at(x, y):
-        lcd.move_to(x,y)
+    def move_cursor(self,x, y):
+        self.lcd.move_to(x,y)
 
-    def write(string):
-        lcd.putstr(string)
+    def write(self,string):
+        self.lcd.putstr(string)
 

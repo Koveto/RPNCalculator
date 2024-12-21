@@ -4,19 +4,19 @@ from machine import Pin
 from gpio_lcd import GpioLcd
 
 # Create the LCD object
-lcd = GpioLcd(rs_pin=Pin(16),
-              enable_pin=Pin(17),
-              d4_pin=Pin(18),
-              d5_pin=Pin(19),
-              d6_pin=Pin(20),
-              d7_pin=Pin(21),
+lcd = GpioLcd(rs_pin=Pin(28),
+              enable_pin=Pin(27),
+              d4_pin=Pin(26),
+              d5_pin=Pin(22),
+              d6_pin=Pin(21),
+              d7_pin=Pin(20),
               num_lines=4, num_columns=16)
 
 # #The following line of codes should be tested one by one according to your needs
 #
 # #1. To print a string to the LCD, you can use
 
-lcd.putstr('circuitschools.')
+lcd.putstr('Hi Snap')
 # #2. Now, to clear the display.
 # lcd.clear()
 # #3. and to exactly position the cursor location
