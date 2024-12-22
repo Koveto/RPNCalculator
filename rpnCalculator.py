@@ -6,6 +6,7 @@ from machine import Pin
 from gpio_lcd import GpioLcd
 from time import sleep
 import lcd, keypad, pushButtons
+import ip, calc
 
 PCB = False
 
@@ -52,8 +53,7 @@ else:
                    ("G", "H", "I"),\
                    ("J", "K", "L"))
     # Buttons (Direct connection)
-    BUTTON_PINS = [16,17,18,19]
-
+    BUTTON_PINS = (16,17,18,19)
 
 def main():
     
@@ -72,14 +72,10 @@ def main():
     
     # Initial LCD Output
     if (ROWS > 2):
-        lcdScreen.move_cursor(0,0)
-        lcdScreen.write("rpnCalculator.py")
-        lcdScreen.move_cursor(0,1)
-        lcdScreen.write("Kobe Goodwin")
-    lcdScreen.move_cursor(0,ROWS-2)
-    lcdScreen.write("Y: 0.0000")
-    lcdScreen.move_cursor(0,ROWS-1)
-    lcdScreen.write("X: 0.0000")
+        lcdScreen.write_at(0,0,"rpnCalculator.py")
+        lcdScreen.write_at(0,1,"Kobe Goodwin")
+    lcdScreen.write_at(0,ROWS-2,"Y: 0.0000")
+    lcdScreen.write_at(0,ROWS-1,"X: 0.0000")
     
     
     while(True):
@@ -90,9 +86,13 @@ def main():
 
         # A new key is pressed
         if ip != None and ip != lastIp:
-            #interpretPress(ip)
+            ip.interpretPress(PCB,BUTTON_LIST,KEYPAD_LIST,\
+                              BUTTON_PINS, ip, buttons,\
+                              buttonsDirect, keys, lcdScreen)
             #display()
-            print(ip)
+            #lcdScreen.move_cursor(0,ROWS-1)
+            #lcdScreen.write(str(ip))
+            lcdScreen.write_at(0,ROWS-1,ip)
             lastIp = ip
             
         # A key was released

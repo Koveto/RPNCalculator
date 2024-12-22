@@ -1,4 +1,6 @@
-"""Implements a HD44780 character LCD connected via ESP32 GPIO pins."""
+"""Implements a HD44780 character LCD connected via ESP32 GPIO pins.
+Code from https://www.circuitschools.com/interfacing-16x2-lcd-module-with-raspberry-pi-pico-with-and-without-i2c/
+"""
 
 from lcd_api import LcdApi
 from machine import Pin

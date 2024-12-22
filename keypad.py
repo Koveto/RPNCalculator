@@ -1,15 +1,8 @@
 """
 keypad.py
-12/19/2024 Kobe Goodwin
+12/21/2024 Kobe Goodwin
 
-getKey()
-Scan the keypad. Return a key if pressed.
-
-newKeypad(R1, R2, R3, R4, C1, C2, C3)
-Given pin assignments, make 3 lists.
-row_list... Output pins, 4 rows
-col_list... Input pins, 3 columns
-key_list... Characters found at the locations
+Read input from a keypad
 """
 
 from machine import Pin

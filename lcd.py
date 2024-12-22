@@ -1,21 +1,19 @@
 """
 lcd.py
-12/19/2024 Kobe Goodwin
+12/21/2024 Kobe Goodwin
 
 Manipulate the LCD screen
 
-cursor_at(x,y)
+move_cursor(x,y)
 cursor goes to x,y
 
 write(string)
 write String string starting at x,y. Wraps around
 
-newLCD(col, row, Rs, E, D4, D5, D6, D7)
--> return lcd (type:GpioLcd)
+init(col, row, Rs, E, D4, D5, D6, D7)
+-> create Lcd object with lcd (type:GpioLcd)
 Create a gpio_lcd.GpioLcd object given the
 number of rows, columns, and pins.
-
-Code from https://www.circuitschools.com/interfacing-16x2-lcd-module-with-raspberry-pi-pico-with-and-without-i2c/
 """
 
 from machine import Pin
@@ -36,4 +34,8 @@ class Lcd:
 
     def write(self,string):
         self.lcd.putstr(string)
+        
+    def write_at(self,x,y,string):
+        self.move_cursor(x,y)
+        self.write(string)
 

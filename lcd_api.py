@@ -1,4 +1,6 @@
-"""Provides an API for talking to HD44780 compatible character LCDs."""
+"""Provides an API for talking to HD44780 compatible character LCDs.
+Code from https://www.circuitschools.com/interfacing-16x2-lcd-module-with-raspberry-pi-pico-with-and-without-i2c/
+"""
 
 import time
 

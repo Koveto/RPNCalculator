@@ -1,9 +1,9 @@
 """
 pushButtons
-12/19/2024 Kobe Goodwin
+12/21/2024 Kobe Goodwin
 
-Given a list of pin numbers, create list
-of Pin objects.
+Read input from push button array or push buttons
+directly connected.
 """
 
 from machine import Pin
