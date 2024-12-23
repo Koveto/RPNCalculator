@@ -141,11 +141,17 @@ class Number:
                              not other.negativeR,\
                              not other.negativeI)
     
-    def __mul__(self, other):
-        pass
+    #def __mul__(self, other):
+        # (a + jb)(c + jd) = ac + jad + jbc - bd
+    #    ac = 
     
     def __truediv__(self, other):
-        pass
+        (zReal, zDecR, zIsNegative) = longDivision(self.imag,\
+                other.imag, self.decI, other.decI,\
+                self.negativeI, other.negativeI)
+        return Number(0, zReal, [], zDecR, False,zIsNegative)
+        #def longDivision(xReIm, yReIm, xDeci, yDeci,\
+        #         xIsNegative, yIsNegative):
     
     def __mod__(self, other):
         pass
@@ -192,7 +198,14 @@ def getY():
         return stack[-2]
     else:
         return Number(0)
-    
+
+# Add the real or imaginary parts of a Number
+# xReIm: X left of decimal point, int
+# yReIm: Y left of decimal point, int
+# xDeci: X right of decimal point, list of ints
+# yDeci: Y right of decimal point, list of ints
+# negativeCondition: when to subtract carry
+# Returns (zReIm, zDeci)
 def carryAdd(xReIm, yReIm, xDeci, yDeci,\
              negativeCondition):
     carry = 0
@@ -211,6 +224,14 @@ def carryAdd(xReIm, yReIm, xDeci, yDeci,\
         zReIm = xReIm + yReIm + carry
     return (zReIm, zDeci)
 
+# Subtract the real or imaginary part of a number
+# xReIm: X left of decimal point, int
+# yReIm: Y left of decimal point, int
+# xDeci: X right of decimal point, list of ints
+# yDeci: Y right of decimal point, list of ints
+# negativeCondition: when to subtract borrow
+# negativeOutput: what sign changes if 0 and NC?
+# Returns (zReIm, zDeci, negativeOutput)
 def borrowSub(xReIm, yReIm, xDeci, yDeci,\
               negativeCondition, negativeOutput):
     borrow = 0
@@ -224,14 +245,135 @@ def borrowSub(xReIm, yReIm, xDeci, yDeci,\
             borrow = 0
         zDeci[i] = t
     if (negativeCondition):
-        real = xReIm + yReIm - borrow
+        zReIm = xReIm + yReIm - borrow
     else:
-        real = xReIm + yReIm + borrow
-    if (real == 0 and negativeCondition):
+        zReIm = xReIm + yReIm + borrow
+    if (zReIm == 0 and negativeCondition):
         negativeOutput = True
-    return (real, zDeci, negativeOutput)
+    return (zReIm, zDeci, negativeOutput)
+
+def multiply(xReIm, yReIm, xDeci, yDeci,\
+             xIsNegative, yIsNegative):
+    carry = 0
+    zDeci = [0] * DECIMAL_PLACES
+    zIsNegative = False
+    for i in range(DECIMAL_PLACES - 1,-1,-1):
+        t = carry + xDeci[i] + yDeci[i]
+        if (t > 9):
+            carry = int(str(t)[0])
+            t = int(str(t)[1])
+        else:
+            carry = 0
+        zDeci[i] = t
+    if (xIsNegative != yIsNegative or
+        (xIsNegative == True and yIsNegative == True)):
+        zIsNegative = True
+    zReIm = (xReIm + carry) * yReIm
+    return (zReIm, zDeci, zIsNegative)
+
+def longDivision(xReIm, yReIm, xDeci, yDeci,\
+                 xIsNegative, yIsNegative):
+    # Obtain list of digits left of decimal
+    # Ex. 480 -> [4,8,0]
+    xLeft = list(str(xReIm))
+    yLeft = list(str(yReIm))
+    # Line up numbers
+    if (len(xLeft) < len(yLeft)):
+        xLeft = [0] * (len(yLeft) - len(xLeft)) + xLeft
+    if (len(xLeft) > len(yLeft)):
+        yLeft = [0] * (len(xLeft) - len(yLeft)) + yLeft
+    # Full list of digits
+    # Ex. 480.208 -> [4,8,0,2,0,8]
+    digitsX = xLeft + xDeci
+    digitsY = yLeft + yDeci
     
-# Compare two Numbers > 0
+    # Result digits
+    z = [None] * (len(xLeft) + DECIMAL_PLACES)
+    
+    # argX: 10984713424
+    # argY:     2024323
+    argX = ""
+    argY = ""
+    for j in range(len(digitsX)):
+        argX += str(digitsX[j])
+        argY += str(digitsY[j])
+    argX = int(argX)
+    argY = int(argY)
+    
+    m = 1
+    nextZ = 0
+    dif = 0
+    if (argX >= argY):
+        # m = 5426
+        while (m*argY < argX):
+            m += 1
+        m -= 1
+        
+        # mArgY = 10983976598
+        mArgY = m * argY
+        
+        # [None, None, '5','4','2','6',None...]
+        strM = str(m)
+        if (len(xLeft) > len(strM)):
+            zerosFront = len(xLeft) - len(strM)
+            for i in range(len(strM)):
+                z[i+zerosFront] = strM[i]
+            nextZ = len(xLeft)
+        else:
+            dif = len(strM) - len(xLeft)
+            for i in range(dif):
+                z = [strM[len(strM) - 2 - i]] + z
+            for i in range(dif,len(strM)):
+                z[i] = strM[i]
+            nextZ = len(xLeft) + dif
+            
+        argX = argX - mArgY
+    
+    zeroFlag = False
+
+    # Left to right
+    while (nextZ < len(z)):
+        if (argX < argY):
+            argX *= 10
+            if (zeroFlag):
+                z[nextZ] = "0"
+                nextZ += 1
+            zeroFlag = True
+            continue
+        zeroFlag = False
+        m = 1
+        while (m*argY < argX):
+            m += 1
+        m -= 1
+        z[nextZ] = str(m)
+        nextZ += 1
+        mArgY = m * argY
+        argX = argX - mArgY
+    
+    
+    zLeft = z[:len(xLeft) + dif]
+    zReIm = ""
+    for i in range(len(zLeft)):
+        if (zLeft[i] != None): zReIm += zLeft[i]
+    zReIm = int(zReIm)
+    
+    zDeci = z[len(xLeft) + dif:]
+    for i in range(len(zDeci)):
+        zDeci[i] = int(zDeci[i])
+        
+    if (xIsNegative == yIsNegative):
+        zIsNegative = False
+    else:
+        zIsNegative = True
+    
+    return (zReIm, zDeci, zIsNegative)
+    
+# Determine which quantity (absolute value)
+# is bigger.
+# n1: X left of decimal, int
+# d1: X right of decimal, list of ints
+# n2: Y left of decimal, int
+# d2: Y right of decimal, list of ints
 def greaterThan(n1, d1, n2, d2):
     if (n1 > n2):
         return True
@@ -441,3 +583,15 @@ if (str(x-y) == "-6.50604 + j15.44657"):
 else:
     print("Test 20 Failed!")
     print(x-y)
+    
+#def multiply(xReIm, yReIm, xDeci, yDeci,\
+#             xIsNegative, yIsNegative):
+#x = multiply(8,0,[0,0,6,0,8],[7,5,1,6,2],True, True)
+#print(x)
+
+# -109847.13424 + j8.00808
+#     -20.24323 + j0.75162
+x = Number(109847,8,[1,3,4,2,4],[0,0,7,0,8],True,False)
+y = Number(20,0,[2,4,3,2,3],[7,5,1,6,2],True,False)
+print(x / y)
+#longDivision(109847,20,[1,3,4,2,4],[2,4,3,2,3],False,False)
