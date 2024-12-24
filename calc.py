@@ -1,10 +1,10 @@
 """
 calc.py
-Kobe Goodwin 12/22/2024
+Kobe Goodwin 12/24/2024
 Perform operations and keep track of numbers
 """
 
-DECIMAL_PLACES = 5
+DECIMAL_PLACES = 20
 
 # Represents a number with DECIMAL_PLACES number of
 # decimal places. It has a real and complex part.
@@ -141,17 +141,80 @@ class Number:
                              not other.negativeR,\
                              not other.negativeI)
     
-    #def __mul__(self, other):
-        # (a + jb)(c + jd) = ac + jad + jbc - bd
-    #    ac = 
-    
     def __truediv__(self, other):
-        (zReal, zDecR, zIsNegative) = longDivision(self.imag,\
-                other.imag, self.decI, other.decI,\
-                self.negativeI, other.negativeI)
+        # self = a + bi
+        # other = c + di
+        # 1. find c^2 + d^2
+        
+        # 1/c
+        (s1ReIm, s1Deci, s1Neg) = longDivision(1,other.real,\
+                [0] * DECIMAL_PLACES, other.decR,\
+                False, other.negativeR)
+        # c^2 = c/s1
+        (s2ReIm, s2Deci, s2Neg) = longDivision(other.real, s1ReIm,\
+                other.decR, s1Deci,\
+                other.negativeR, s1Neg)
+        # 1/d
+        (s3ReIm, s3Deci, s3Neg) = longDivision(1,other.imag,\
+                [0] * DECIMAL_PLACES, other.decI,\
+                False, other.negativeI)
+        # d^2 = d/s3
+        (s4ReIm, s4Deci, s4Neg) = longDivision(other.imag, s3ReIm,\
+                other.decI, s3Deci,\
+                other.negativeI, s3Neg)
+        # c^2 + d^2 = s2 + s4 = x
+        s2Num = Number(s2ReIm,0,s2Deci,[],s2Neg)
+        s4Num = Number(s4ReIm,0,s4Deci,[],s4Neg)
+        x = s2Num + s4Num
+        # ac = a/(1/c) = a/s1
+        (s5ReIm, s5Deci, s5Neg) = longDivision(self.real, s1ReIm,\
+                self.decR, s1Deci,\
+                self.negativeR, s1Neg)
+        # bd = b/(1/d) = b/s3
+        (s6ReIm, s6Deci, s6Neg) = longDivision(self.imag, s3ReIm,\
+                self.decI, s3Deci,\
+                self.negativeI, s3Neg)
+        # ac + bd = s5 + s6 = f
+        s5Num = Number(s5ReIm,0,s5Deci,[],s5Neg)
+        s6Num = Number(s6ReIm,0,s6Deci,[],s6Neg)
+        f = s5Num + s6Num
+        # real = (ac+bd)/(c^2 + d^2) = f/x
+        (real, decR, negativeR) = longDivision(f.real, x.real,\
+                f.decR, x.decR, f.negativeR, x.negativeR)
+        # bc = b/(1/c) = b/s1
+        (s7ReIm, s7Deci, s7Neg) = longDivision(self.imag, s1ReIm,\
+                self.decI, s1Deci, self.negativeI, s1Neg)
+        # ad = a/(1/d) = a/s3
+        (s8ReIm, s8Deci, s8Neg) = longDivision(self.real, s3ReIm,\
+                self.decR, s3Deci, self.negativeR, s3Neg)
+        # bc - ad =  s7 - s8 = g
+        s7Num = Number(s7ReIm,0,s7Deci,[],s7Neg)
+        s8Num = Number(s8ReIm,0,s8Deci,[],s8Neg)
+        g = s7Num - s8Num
+        # imag = (bc-ad)/(c^2 + d^2) = g/x
+        (imag, decI, negativeI) = longDivision(g.real, x.real,\
+                g.decR, x.decR, g.negativeR, x.negativeR)
+        return Number(real, imag, decR, decI, negativeR, negativeI)
+        """
+        (zReal, zDecR, zIsNegative) = longDivision(self.real,\
+                other.real, self.decR, other.decR,\
+                self.negativeR, other.negativeR)
+        
+        (a,b,c) = longDivision(1,self.real,\
+                [0,0,0,0,0],self.decR,\
+                False, self.negativeR)
+        zReal = a
+        zDecR = b
+        zIsNegative = c
+        
         return Number(0, zReal, [], zDecR, False,zIsNegative)
         #def longDivision(xReIm, yReIm, xDeci, yDeci,\
         #         xIsNegative, yIsNegative):
+        """
+    def __mul__(self, other):
+        n1 = Number(1)
+        n2 = n1 / other
+        return self / n2
     
     def __mod__(self, other):
         pass
@@ -273,6 +336,13 @@ def multiply(xReIm, yReIm, xDeci, yDeci,\
 
 def longDivision(xReIm, yReIm, xDeci, yDeci,\
                  xIsNegative, yIsNegative):
+    """print(xReIm)
+    print(xDeci)
+    print(yReIm)
+    print(yDeci)
+    print()"""
+    if (yReIm == 0 and yDeci == [0] * DECIMAL_PLACES):
+        return (0,[],False)
     # Obtain list of digits left of decimal
     # Ex. 480 -> [4,8,0]
     xLeft = list(str(xReIm))
@@ -307,30 +377,38 @@ def longDivision(xReIm, yReIm, xDeci, yDeci,\
         # m = 5426
         while (m*argY < argX):
             m += 1
-        m -= 1
+        if (m*argY != argX):
+            m -= 1
         
         # mArgY = 10983976598
         mArgY = m * argY
-        
         # [None, None, '5','4','2','6',None...]
         strM = str(m)
         if (len(xLeft) > len(strM)):
             zerosFront = len(xLeft) - len(strM)
+            for i in range(zerosFront):
+                z[i] = "0"
             for i in range(len(strM)):
                 z[i+zerosFront] = strM[i]
             nextZ = len(xLeft)
         else:
+            # The multiple is too long!
             dif = len(strM) - len(xLeft)
-            for i in range(dif):
-                z = [strM[len(strM) - 2 - i]] + z
+            z = list(strM[:dif]) + z
             for i in range(dif,len(strM)):
                 z[i] = strM[i]
             nextZ = len(xLeft) + dif
             
         argX = argX - mArgY
-    
-    zeroFlag = False
+    else:
+        for i in range(len(xLeft)):
+            z[i] = "0"
+        nextZ = len(z)-DECIMAL_PLACES
 
+    #if (xReIm == 12):
+    #    print(z)
+
+    zeroFlag = False
     # Left to right
     while (nextZ < len(z)):
         if (argX < argY):
@@ -344,11 +422,34 @@ def longDivision(xReIm, yReIm, xDeci, yDeci,\
         m = 1
         while (m*argY < argX):
             m += 1
-        m -= 1
+        if (m*argY != argX):
+            m -= 1
         z[nextZ] = str(m)
         nextZ += 1
         mArgY = m * argY
         argX = argX - mArgY
+        if (nextZ == len(z)):
+            #print("here")
+            #print(z)
+            #print(argX)
+            #print(argY)
+            if (argX < argY):
+                if (argX*10 < argY):
+                    continue
+                else:
+                    argX *= 10
+            m = 1
+            while (m*argY < argX):
+                m += 1
+            m -= 1
+            if (m > 4):
+                index = -1
+                flag = True
+                z[index] = str(int(z[index]) + 1)
+                while z[index] == "10":
+                    z[index] = "0"
+                    z[index-1] = str(int(z[index-1]) + 1)
+                    index -= 1
     
     
     zLeft = z[:len(xLeft) + dif]
@@ -589,9 +690,14 @@ else:
 #x = multiply(8,0,[0,0,6,0,8],[7,5,1,6,2],True, True)
 #print(x)
 
-# -109847.13424 + j8.00808
+# -109847.13424 + j8.00708
 #     -20.24323 + j0.75162
-x = Number(109847,8,[1,3,4,2,4],[0,0,7,0,8],True,False)
-y = Number(20,0,[2,4,3,2,3],[7,5,1,6,2],True,False)
-print(x / y)
+x = Number(109,12,[9,9,9,9,9],[9,2,4,3,1])
+y = Number(8,-999,[0,0,0,0,1],[0,0,0,0,0])
+if (str(x / y) == "-0.01206 - j0.11020"):
+    print("Test 21 Success!")
+else:
+    print("Test 21 Failed!")
+    print(x/y)
+print(x*y)
 #longDivision(109847,20,[1,3,4,2,4],[2,4,3,2,3],False,False)
