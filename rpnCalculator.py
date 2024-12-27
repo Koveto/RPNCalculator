@@ -6,7 +6,7 @@ from machine import Pin
 from gpio_lcd import GpioLcd
 from time import sleep
 import lcd, keypad, pushButtons
-import ip, calc
+import ip, calc, display
 
 PCB = False
 
@@ -21,13 +21,13 @@ if (PCB == True):
     # Button Array
     BUTTON_ROWS = [3, 4, 5, 6, 7, 8, 9]
     BUTTON_COLS = [10, 11, 12, 13, 14, 15]
-    BUTTON_LIST = (("B01", "B02", "B03", "B04", "B05", "B06"),\
-                ("B07", "B08", "B09", "B10", "B11", "B12"),\
-                ("B13", "B13", "B14", "B15", "B16", "B17"),\
-                ("B18", "B19", "B20", "B21", "B22", "B23"),\
-                ("B24", "B25", "B26", "B27", "B28", "B29"),\
-                ("B30", "B31", "B32", "B33", "B34", "B35"),\
-                ("B36", "B37", "B38", "B39", "B40", "B41"))
+    button_list = (("B36", "B37", "B38", "B39", "B40", "B41"),\
+               ("B30", "B31", "B32", "B33", "B34", "B35"),\
+               ("B24", "B25", "B26", "B27", "B28", "B29"),\
+               ("B18", "B19", "B20", "B21", "B22", "B23"),\
+               ("B13", "B13", "B14", "B15", "B16", "B17"),\
+               ("B07", "B08", "B09", "B10", "B11", "B12"),\
+               ("B01", "B02", "B03", "B04", "B05", "B06"))
 else:
     # LCD
     COLUMNS = 20
@@ -69,6 +69,7 @@ def main():
         keys = keypad.Keypad(KEYPAD_ROWS, KEYPAD_COLS, KEYPAD_LIST)
         buttons = pushButtons.PushButtons(BUTTON_ROWS, BUTTON_COLS, BUTTON_LIST)
         buttonsDirect = pushButtons.PushButtonsDirect(BUTTON_PINS)
+    disp = Display(ROWS, COLUMNS)
     
     # Initial LCD Output
     if (ROWS > 2):
@@ -89,10 +90,9 @@ def main():
             ip.interpretPress(PCB,BUTTON_LIST,KEYPAD_LIST,\
                               BUTTON_PINS, ip, buttons,\
                               buttonsDirect, keys, lcdScreen)
-            #display()
-            #lcdScreen.move_cursor(0,ROWS-1)
-            #lcdScreen.write(str(ip))
-            lcdScreen.write_at(0,ROWS-1,ip)
+            (x, y) = disp.get()
+            lcdScreen.write_at(0,ROWS-2,y)
+            lcdScreen.write_at(0,ROWS-1,x)
             lastIp = ip
             
         # A key was released
