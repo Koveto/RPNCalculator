@@ -6,7 +6,7 @@ from machine import Pin
 from gpio_lcd import GpioLcd
 from time import sleep
 import lcd, keypad, pushButtons
-import ip, calc, display
+import ipHandler, number, display
 
 PCB = False
 
@@ -39,15 +39,15 @@ else:
     D6 = 21
     D7 = 20
     # Keypad
-    KEYPAD_ROWS = (6,7,8,9)
-    KEYPAD_COLS = (10,11,12)
+    KEYPAD_ROWS = (0,1,2,3)
+    KEYPAD_COLS = (4,5,6)
     KEYPAD_LIST = (("1", "2", "3"),\
                    ("4", "5", "6"),\
                    ("7", "8", "9"),\
                    ("*", "0", "#"))
     # Button Array
-    BUTTON_ROWS = (0,1,2)
-    BUTTON_COLS = (3,4,5)
+    BUTTON_ROWS = (14,15,13)
+    BUTTON_COLS = (11,10,12)
     BUTTON_LIST = (("A", "B", "C"),\
                    ("D", "E", "F"),\
                    ("G", "H", "I"),\
@@ -69,14 +69,14 @@ def main():
         keys = keypad.Keypad(KEYPAD_ROWS, KEYPAD_COLS, KEYPAD_LIST)
         buttons = pushButtons.PushButtons(BUTTON_ROWS, BUTTON_COLS, BUTTON_LIST)
         buttonsDirect = pushButtons.PushButtonsDirect(BUTTON_PINS)
-    disp = Display(ROWS, COLUMNS)
+    disp = display.Display(ROWS, COLUMNS)
     
     # Initial LCD Output
     if (ROWS > 2):
         lcdScreen.write_at(0,0,"rpnCalculator.py")
         lcdScreen.write_at(0,1,"Kobe Goodwin")
-    lcdScreen.write_at(0,ROWS-2,"Y: 0.0000")
-    lcdScreen.write_at(0,ROWS-1,"X: 0.0000")
+    lcdScreen.write_at(0,ROWS-2,"Y: 0")
+    lcdScreen.write_at(0,ROWS-1,"X: 0")
     
     
     while(True):
@@ -87,11 +87,12 @@ def main():
 
         # A new key is pressed
         if ip != None and ip != lastIp:
-            ip.interpretPress(PCB,BUTTON_LIST,KEYPAD_LIST,\
-                              BUTTON_PINS, ip, buttons,\
-                              buttonsDirect, keys, lcdScreen)
+            ipHandler.interpretPress(PCB,BUTTON_LIST,KEYPAD_LIST,\
+                                     BUTTON_PINS, ip, disp)
             (x, y) = disp.get()
+            lcdScreen.write_at(0,ROWS-2," " * COLUMNS)
             lcdScreen.write_at(0,ROWS-2,y)
+            lcdScreen.write_at(0,ROWS-1," " * COLUMNS)
             lcdScreen.write_at(0,ROWS-1,x)
             lastIp = ip
             

@@ -1,8 +1,10 @@
 """
-ip.py
-Kobe Goodwin 12/21/2024
+ipHandler.py
+Kobe Goodwin 12/31/2024
 Call function based off input
 """
+
+
 
 def interpretPress(PCB,BUTTON_LIST,KEYPAD_LIST,BUTTON_PINS,\
                    ip,buttons,buttonsDirect,keys,lcdScreen):
@@ -44,6 +46,12 @@ def interpretPress(PCB,BUTTON_LIST,KEYPAD_LIST,BUTTON_PINS,\
         if (ip == KEYPAD_LIST[2][1]): # "8"
             pass
         if (ip == KEYPAD_LIST[2][2]): # "9"
+            pass
+        if (ip == KEYPAD_LIST[3][0]): # "*"
+            pass
+        if (ip == KEYPAD_LIST[3][1]): # "0"
+            pass
+        if (ip == KEYPAD_LIST[3][2]): # "#"
             pass
         if (ip == len(BUTTON_PINS) - 4): # 0
             pass

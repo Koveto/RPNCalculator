@@ -483,7 +483,7 @@ def greaterThan(n1, d1, n2, d2):
         if d2[x] > d1[x]:
             return False
     return False
-
+"""
 # 1.12345 + j2.98765
 # 3.85762 + j1.42738
 x = Number(1,2,[1,2,3,4,5],[9,8,7,6,5])
@@ -698,3 +698,4 @@ else:
     print(x/y)
 print(x*y)
 #longDivision(109847,20,[1,3,4,2,4],[2,4,3,2,3],False,False)
+"""
