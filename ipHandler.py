@@ -10,7 +10,7 @@ Calls button function depending on ip.
 Returns (x, y) from display.get()
 """
 
-def interpretPress(ip, display):
+def interpretPress(ip, display, BUTTON_LIST):
     if (ip == BUTTON_LIST[0][0]): # "B36"
         pass
     elif (ip == BUTTON_LIST[0][1]): # "B37"

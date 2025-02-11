@@ -1,5 +1,5 @@
 """
-rpnCalculator.py
+test_buttons.py
 Kobe Goodwin
 """
 from machine import Pin
@@ -49,10 +49,7 @@ def main():
 
         # A new key is pressed
         if ip != None and ip != lastIp:
-            (x,y) = ipHandler.interpretPress(ip, disp,\
-                                             BUTTON_LIST)
-            lcdScreen.write_at(0,ROWS-2,y)
-            lcdScreen.write_at(0,ROWS-1,x)
+            lcdScreen.write_at(0,ROWS-1,ip)
             lastIp = ip
            
         # A key was released
