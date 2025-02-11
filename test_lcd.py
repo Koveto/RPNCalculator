@@ -20,13 +20,11 @@ def main():
     lcdScreen = lcd.Lcd(COLUMNS, ROWS, RS, E, D4, D5, D6, D7)
     print(lcdScreen)
     
-    lcdScreen.cursor_at(0)
-    """
+    lcdScreen.move_cursor(15,0)
+    
     # Display
-    lcdScreen.cursor_at(11,2)
     lcdScreen.write("Y: 0.0000")
-    lcdScreen.cursor_at(11,3)
-    lcdScreen.write("X: 0.0000")"""
+    lcdScreen.write("X: 0.0000")
     
     while(True):
         pass
