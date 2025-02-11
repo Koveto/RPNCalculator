@@ -21,7 +21,30 @@ Reset X and Y to 0
 numberPressed(digit)
 Append the number to the X row
 
+backspace()
+Remove the last digit from the X row
 
+enter()
+Push the X row to the stack
+
+add()
+Add X and Y rows, output to X
+
+sub()
+Subtract Y-X rows, output to X
+
+mul()
+Multiply X and Y rows, output to X
+
+div()
+Divide Y/X rows, output to X
+
+__abbreviate(s)
+s: String representing some number
+Return a shortened s using scientific notation
+
+__getXNumber()
+Convert x to a number and returns it
 """
 
 from stack import Stack
@@ -35,138 +58,41 @@ class Display:
     def __init__(self, ROWS, COLUMNS):
         self.rows = ROWS
         self.cols = COLUMNS
-        self.x = ""
-        self.y = None
+        self.x = 0
+        self.y = 0
         self.isOffScreen = False
         self.isTyping = False
         self.stack = Stack()
         
     def get( self ):
-        if (self.isTyping):
-            
-            if (len(self.x) == self.cols - 3):
-                self.isOffScreen = True
-                strX = self.x[1:]
-            elif (len(self.x) > self.cols - 3):
-                strX = self.x[len(self.x) - self.cols + 4:]
-            else:
-                strX = self.x
-                self.isOffScreen = False
-                
-        else:
-            
-            strX = self.__abbreviate(self.x)
-            self.isOffScreen = False
-            
-        strY = self.__abbreviate(str(self.y))
-        if (strY == "" or self.y == None or strY == "None"):
-            strY = "0"
-            
-        if (self.isOffScreen):
-            pre = X_OFF
-        else:
-            pre = X_ON
-        if (self.isTyping):
-            post = "_"
-        else:
-            post = ""
-        tempX = pre + strX + post
-        tempY = Y + strY
-        finalX = tempX + ((COLUMNS-len(tempX))*" ")
-        finalY = tempY + ((COLUMNS-len(tempY))*" ")
-            
-        return (finalX, finalY)
+        return ("X: 0           ","Y: 0            ")
     
     def clear( self ):
-        self.stack = Stack()
-        self.x = "0"
-        self.y = 0
-        self.isOffScreen = False
-        self.isTyping = False
+        pass
     
     def numberPressed( self, digit ):
-        if (self.isTyping):
-            if (len(self.x) > 99):
-                return
-            self.x += str(digit)
-        else:
-            self.stack.push(self.__getXNumber())
-            self.y = self.stack.peek()
-            self.x = str(digit)
-            self.isTyping = True
+        pass
     
     def backspace( self ):
-        if (not self.isTyping):
-            self.stack.pop()
-            self.numberPressed(0)
-            #self.isTyping = True
-            return
-        if (len(self.x) == 1):
-            self.x = "0"
-            self.isTyping = False
-            return
-        self.x = self.x[:len(self.x) - 1]
+        pass
     
     def enter( self ):
-        n = self.__getXNumber()
-        self.stack.push(n)
-        self.y = self.stack.peek()
-        self.isTyping = False
+        pass
         
     def add( self ):
-        n1 = self.__getXNumber()
-        n2 = self.stack.pop()
-        if (n2 == None):
-            n2 = Number(0)
-        n3 = n1 + n2
-        self.y = self.stack.peek()
-        self.x = str(n3)
-        self.isTyping = False
-        self.isOffScreen = False
+        pass
         
     def sub( self ):
-        n1 = self.__getXNumber()
-        n2 = self.stack.pop()
-        if (n2 == None):
-            n2 = Number(0)
-        n3 = n2 - n1
-        self.y = self.stack.peek()
-        self.x = str(n3)
-        self.isTyping = False
-        self.isOffScreen = False
+        pass
         
     def mul( self ):
-        n1 = self.__getXNumber()
-        n2 = self.stack.pop()
-        if (n2 == None):
-            n2 = 0
-        n3 = n1 * n2
-        self.y = self.stack.peek()
-        self.x = str(n3)
-        self.isTyping = False
-        self.isOffScreen = False
+        pass
         
     def div( self ):
-        n1 = self.__getXNumber()
-        n2 = self.stack.pop()
-        if (n2 == None):
-            n2 = 0
-        n3 = n2 / n1
-        self.y = self.stack.peek()
-        self.x = str(n3)
-        self.isTyping = False
-        self.isOffScreen = False
+        npass
         
     def __abbreviate( self, s ):
-        if (len(s) < self.cols - 3):
-            return s
-        return s[0] + "." + s[1:3] + "E+" + str(len(s) - 1)
+        pass
     
     def __getXNumber( self ):
-        if ("." not in self.x and self.x != ""):
-            return int(self.x)
-        return 0
-    
-        # 55555555555555555555
-        # 5.5555E+15
-        # 5.5555E+19
+        pass

@@ -4,8 +4,8 @@ Kobe Goodwin
 """
 from machine import Pin
 from time import sleep_ms
-import lcd, keypad, pushButtons
-import ipHandler, number, display
+import lcd, pushButtons
+import ipHandler, display
 
 # Pinout assignment...
 # LCD    
