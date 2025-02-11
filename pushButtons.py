@@ -1,9 +1,17 @@
 """
-pushButtons
-12/21/2024 Kobe Goodwin
+pushButtons.py
+2/11/2025 Kobe Goodwin
+Read input from push button array.
 
-Read input from push button array or push buttons
-directly connected.
+init(rowPinNos, colPinNos, buttonList)
+rowPinNos: list of pin numbers for rows
+colPinNos: list of pin numbers for columns
+buttonList: nested list of string identifiers
+Initializes row pins as output and sets them
+Initializes column pins as input
+
+getButton()
+Scan button array and return identifier if pressed
 """
 
 from machine import Pin
@@ -50,7 +58,7 @@ class PushButtons:
             # Reset output to 1111
             r.value(1)
             
-            
+"""
 class PushButtonsDirect:
     
     def __init__(self,pins):
@@ -68,3 +76,4 @@ class PushButtonsDirect:
                 if (button.value() == 0):
                     return i
             i = i + 1
+"""

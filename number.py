@@ -1,6 +1,6 @@
 """
-calc.py
-Kobe Goodwin 12/24/2024
+number.py
+Kobe Goodwin 12/31/2024
 Perform operations and keep track of numbers
 """
 
@@ -143,9 +143,23 @@ class Number:
     
     # You can divide Numbers using the "/" operator
     def __truediv__(self, other):
+        """print("Divide")
+        print(self)
+        print(other)
+        print()"""
         # self = a + bi
         # other = c + di
         # 1. find c^2 + d^2
+        
+        if ((not self.isComplex) and (not other.isComplex)):
+            # a/c
+            (a, b, c) = longDivision(self.real, other.real,\
+                self.decR, other.decR,\
+                self.negativeR, other.negativeR)
+            """print("NEITHER COMPLEX")
+            print((a,b,c))
+            print()"""
+            return Number(a, 0, b, [0] * DECIMAL_PLACES, c, False)
         
         # 1/c
         (s1ReIm, s1Deci, s1Neg) = longDivision(1,other.real,\
@@ -195,13 +209,19 @@ class Number:
         # imag = (bc-ad)/(c^2 + d^2) = g/x
         (imag, decI, negativeI) = longDivision(g.real, x.real,\
                 g.decR, x.decR, g.negativeR, x.negativeR)
+        #print("END DIVISION\n")
         return Number(real, imag, decR, decI, negativeR, negativeI)
     
     # You can multiply numbers using the "*" operator
     def __mul__(self, other):
+        """print("Multiply")
+        print(self)
+        print(other)"""
         n1 = Number(1)
         n2 = n1 / other
-        return self / n2
+        n3 = self / n2
+        #print("END MULTIPLICATION\n")
+        return n3
     
     def __mod__(self, other):
         pass
@@ -330,7 +350,7 @@ def longDivision(xReIm, yReIm, xDeci, yDeci,\
     print(yDeci)
     print()"""
     if (yReIm == 0 and yDeci == [0] * DECIMAL_PLACES):
-        print("DIVIDE BY ZERO")
+        #print("DIVIDE BY ZERO")
         """print(xReIm)
         print(xDeci)
         print(yReIm)

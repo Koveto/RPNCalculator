@@ -4,20 +4,20 @@ lcd.py
 
 Manipulate the LCD screen
 
-move_cursor(x,y)
-cursor goes to x,y
+write_at(x, y, string)
+x: x cursor position
+y: y cursor position
+string: String containing message
+write string starting at x,y. Wraps around
 
-write(string)
-write String string starting at x,y. Wraps around
-
-init(col, row, Rs, E, D4, D5, D6, D7)
--> create Lcd object with lcd (type:GpioLcd)
-Create a gpio_lcd.GpioLcd object given the
-number of rows, columns, and pins.
+init(col, row, SDA, SCL)
+col: number of columns for the LCD
+row: number of rows for the LCD
+SDA: number of the pin used for serial data
+SCL: number of the pin used for serial clock
 """
 
-from machine import Pin, I2C, SoftI2C
-from gpio_lcd import GpioLcd
+from machine import Pin, SoftI2C
 from lcd_i2c import I2cLcd
 
 class Lcd:
@@ -30,7 +30,7 @@ class Lcd:
         self.lcd.move_to(x,y)
         self.lcd.putstr(string)
 
-class Lcd_Parallel:
+"""class Lcd_Parallel:
     def __init__(self, col, row, Rs, E, D4, D5, D6, D7):
         self.lcd = GpioLcd(rs_pin=Pin(Rs),
               enable_pin=Pin(E),
@@ -49,3 +49,4 @@ class Lcd_Parallel:
     def write_at(self,x,y,string):
         self.move_cursor(x,y)
         self.write(string)
+"""
