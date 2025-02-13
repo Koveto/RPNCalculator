@@ -2,9 +2,9 @@
 rpnCalculator.py
 Kobe Goodwin
 """
-from machine import Pin
 from time import sleep_ms
-import lcd, pushButtons
+from lcd import LCD
+from push_buttons import PushButtons
 import ipHandler, display
 
 # Pinout assignment...
@@ -16,13 +16,13 @@ SDA = 0
 # Button Array
 BUTTON_ROWS = [3, 4, 5, 6, 7, 8, 9]
 BUTTON_COLS = [10, 11, 12, 13, 14, 15]
-BUTTON_LIST = (("B36", "B37", "B38", "B39", "B40", "B41"),\
-           ("B30", "B31", "B32", "B33", "B34", "B35"),\
-           ("B24", "B25", "B26", "B27", "B28", "B29"),\
-           ("B18", "B19", "B20", "B21", "B22", "B23"),\
-           ("B13", "B13", "B14", "B15", "B16", "B17"),\
-           ("B07", "B08", "B09", "B10", "B11", "B12"),\
-           ("B01", "B02", "B03", "B04", "B05", "B06"))
+BUTTON_LIST = (("Exponential", "Swap", "0", "Decimal Point", "Add", "B41"),\
+               ("Power", "1", "2", "3", "Subtract", "B35"),\
+           ("Square", "4", "5", "6", "Multiply", "B29"),\
+           ("Scientific Notation", "7", "8", "9", "Divide", "B23"),\
+           ("Enter", "Enter", "Reciprocal", "Negate", "Backspace", "Clear"),\
+           ("Logarithm", "Power of Ten", "B09", "Arctangent", "Arccosine", "Arcsine"),\
+           ("Natural Log", "B02", "B03", "Tangent", "Cosine", "Sine"))
 
 
 def main():

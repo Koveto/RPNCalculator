@@ -66,7 +66,11 @@ class Display:
         self.stack = Stack()
         
     def get( self ):
-        xToReturn = X_ON + self.xStr + (" " * (len(X_ON + self.xStr)))
+        if (self.isTyping):
+            uline = "_"
+        else:
+            uline = ""
+        xToReturn = X_ON + self.xStr + uline + (" " * (len(X_ON + self.xStr + uline)))
         yToReturn = Y + str(self.y) + (" " * (len(Y + str(self.y))))
         return (xToReturn,yToReturn)
     
@@ -87,6 +91,7 @@ class Display:
             self.__push()
             self.x = digit
             self.xStr = str(digit)
+            self.isTyping = True
     
     def backspace( self ):
         if (not self.isTyping):
@@ -138,4 +143,5 @@ class Display:
     
     def __getXNumber( self ):
         pass
+
 
