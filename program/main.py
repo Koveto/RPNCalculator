@@ -1,6 +1,6 @@
 """
 main.py
-2/12/2025 Kobe Goodwin
+2/13/2025 Kobe Goodwin
 
 Initializes I/O, polls button input, interprets presses, updates LCD.
 """
@@ -21,13 +21,13 @@ SCL = 1
 BUTTON_ROWS = [3, 4, 5, 6, 7, 8, 9]
 BUTTON_COLS = [10, 11, 12, 13, 14, 15]
 BUTTON_LIST = (
-    ("Exponential",        "Swap",       "0",       "Decimal Point", "Add",     "B41"),
-    ("Power",              "1",          "2",       "3",             "Subtract", "B35"),
-    ("Square",             "4",          "5",       "6",             "Multiply", "B29"),
-    ("Scientific Notation", "7",         "8",       "9",             "Divide",   "B23"),
-    ("Enter",              "Enter",      "Reciprocal", "Negate",     "Backspace", "Clear"),
-    ("Logarithm",          "Power of Ten", "B09",   "Arctangent",    "Arccosine", "Arcsine"),
-    ("Natural Log",        "B02",        "B03",     "Tangent",       "Cosine",   "Sine")
+    ("?",                  "Swap",       "0",       "Decimal Point", "Add",      "Natural Log"),
+    ("?",                  "1",          "2",       "3",             "Subtract", "Exponential"),
+    ("?",                  "4",          "5",       "6",             "Multiply", "Logarithm"),
+    ("Scientific Notation", "7",         "8",       "9",             "Divide",   "Power of Ten"),
+    ("?",                  "Enter",      "Backspace","Clear",        "Square",   "Power"),
+    ("?",                  "?",          "Negate",  "Sine",          "Cosine",   "Tangent"),
+    ("?",                  "?",          "Reciprocal","Arcsine",       "Arccosine","Arctangent")
 )
 
 def main():
