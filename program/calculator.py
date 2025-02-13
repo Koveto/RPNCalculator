@@ -1,23 +1,3 @@
-"""
-Calculator for handling reverse polish notation (RPN) inputs.
-
-Fields:
-- lcd: Instance of the LCD class.
-- stack: Instance of the Stack class.
-- current_input: Keeps track of the current number being input.
-- input_in_progress: Boolean flag to indicate if a number is in the process of being input.
-
-Methods:
-- __init__(self, lcd): Initializes the calculator and updates the LCD display with the initial values.
-- handle_digit_input(self, digit): Handles digit input and updates the LCD display.
-- add_decimal_point(self): Adds a decimal point to the current input.
-- calculate_result(self): Finalizes the current input, pushes it to the stack, and updates the LCD display.
-- clear_display(self): Empties the stack and clears the input, resetting the display to the startup state.
-- delete_last_input(self): Removes the last digit or decimal point if a number is in progress, or resets the X row to 0.
-- handle_operator_input(self, operator): Handles arithmetic operations using the top two numbers on the stack.
-- update_display(self): Updates the LCD display based on the current state.
-"""
-
 import math
 from stack import Stack
 
@@ -154,32 +134,103 @@ class Calculator:
             self.current_input = ""
             self.input_in_progress = False
             self.update_display()
-            
-    def negate_number(self):
+
+    def unary_operation(self, op):
         """
-        Solves X = -X and updates the display.
+        Performs a unary operation on the top number on the stack.
+
+        Args:
+            op (str): A string representing the operation.
+                      Valid operations are: "Natural Log", "Exponential", "Logarithm",
+                      "Power of Ten", "Square", "Sine", "Cosine", "Tangent",
+                      "Arcsine", "Arccosine", "Arctangent", "Negate", "Reciprocal".
         """
+        if not self.input_in_progress and self.stack.is_empty():
+            return
+
         if self.input_in_progress:
-            self.current_input = str(-float(self.current_input))
-        else:
-            if not self.stack.is_empty():
-                x = self.stack.pop()
-                self.stack.push(-x)
-        self.update_display()
-    
-    def calculate_reciprocal(self):
-        """
-        Solves X = 1/X and updates the display.
-        """
-        if self.input_in_progress:
-            self.current_input = str(1 / float(self.current_input))
-        else:
-            if not self.stack.is_empty():
-                x = self.stack.pop()
-                if x != 0:
-                    self.stack.push(1 / x)
-        self.update_display()
+            self.stack.push(float(self.current_input))
+            self.current_input = ""
+            self.input_in_progress = False
         
+        x = self.stack.pop() if not self.stack.is_empty() else 0.0
+        result = None
+
+        if op == "Natural Log":
+            if x == 0.0:
+                self.stack.push(x)
+                return
+            result = math.log(x)
+        elif op == "Exponential":
+            result = math.exp(x)
+        elif op == "Logarithm":
+            if x == 0.0:
+                self.stack.push(x)
+                return
+            result = math.log10(x)
+        elif op == "Power of Ten":
+            result = 10**x
+        elif op == "Square":
+            result = x**2
+        elif op == "Sine":
+            result = math.sin(x)
+        elif op == "Cosine":
+            result = math.cos(x)
+        elif op == "Tangent":
+            result = math.tan(x)
+        elif op == "Arcsine":
+            result = math.asin(x)
+        elif op == "Arccosine":
+            result = math.acos(x)
+        elif op == "Arctangent":
+            result = math.atan(x)
+        elif op == "Negate":
+            result = -x
+        elif op == "Reciprocal":
+            if (x == 0.0):
+                self.stack.push(x)
+                return
+            result = 1 / x
+
+        if result is not None:
+            self.stack.push(result)
+            self.update_display()
+            
+    def binary_operation(self, op):
+        """
+        Performs a binary operation on the top two numbers on the stack.
+
+        Args:
+            op (str): A string representing the operation.
+                      Valid operations are: "Add", "Subtract", "Multiply", "Divide", "Power", "Scientific Notation".
+        """
+        if self.input_in_progress:
+            self.stack.push(float(self.current_input))
+            self.current_input = ""
+            self.input_in_progress = False
+        
+        x = self.stack.pop() if not self.stack.is_empty() else 0.0
+        y = self.stack.pop() if not self.stack.is_empty() else 0.0
+        result = None
+
+        if op == "Add":
+            result = y + x
+        elif op == "Subtract":
+            result = y - x
+        elif op == "Multiply":
+            result = y * x
+        elif op == "Divide":
+            if x != 0:
+                result = y / x
+        elif op == "Power":
+            result = y**x
+        elif op == "Scientific Notation":
+            result = y * (10**x)
+
+        if result is not None:
+            self.stack.push(result)
+            self.update_display()
+
     def swap_values(self):
         """
         Pushes the in-progress number to the stack if any.
@@ -197,60 +248,7 @@ class Calculator:
             self.stack.push(y)
         
         self.update_display()
-
-    def handle_trigonometric_function(self, trig_function):
-        """
-        Handles trigonometric functions on the top number on the stack.
-
-        Args:
-            trig_function (str): A string representing the trig function 
-                                 ("Sine", "Cosine", "Tangent", "Arcsine", "Arccosine", "Arctangent").
-        """
-        if self.input_in_progress:
-            self.stack.push(float(self.current_input))
-            self.current_input = ""
-            self.input_in_progress = False
-        
-        if not self.stack.is_empty():
-            x = self.stack.pop()
-            if trig_function == "Sine":
-                result = math.sin(x)
-            elif trig_function == "Cosine":
-                result = math.cos(x)
-            elif trig_function == "Tangent":
-                result = math.tan(x)
-            elif trig_function == "Arcsine":
-                result = math.asin(x)
-            elif trig_function == "Arccosine":
-                result = math.acos(x)
-            elif trig_function == "Arctangent":
-                result = math.atan(x)
-            
-            self.stack.push(result)
-            self.update_display()
-
-    def handle_logarithm_function(self, log_function):
-        """
-        Handles logarithmic functions on the top number on the stack.
-
-        Args:
-            log_function (str): A string representing the log function ("Logarithm", "Natural Log").
-        """
-        if self.input_in_progress:
-            self.stack.push(float(self.current_input))
-            self.current_input = ""
-            self.input_in_progress = False
-        
-        if not self.stack.is_empty():
-            x = self.stack.pop()
-            if log_function == "Logarithm":
-                result = math.log10(x)
-            elif log_function == "Natural Log":
-                result = math.log(x)
-            
-            self.stack.push(result)
-            self.update_display()
-
+    
     def update_display(self):
         """
         Updates the LCD display based on the current state.
@@ -279,4 +277,6 @@ class Calculator:
         
         # For debugging purposes, print the stack
         print(self.stack)
+
+
 

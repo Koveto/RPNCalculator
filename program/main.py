@@ -24,10 +24,10 @@ BUTTON_LIST = (
     ("?",                  "Swap",       "0",       "Decimal Point", "Add",      "Natural Log"),
     ("?",                  "1",          "2",       "3",             "Subtract", "Exponential"),
     ("?",                  "4",          "5",       "6",             "Multiply", "Logarithm"),
-    ("Scientific Notation", "7",         "8",       "9",             "Divide",   "Power of Ten"),
-    ("?",                  "Enter",      "Backspace","Clear",        "Square",   "Power"),
+    ("Scientific Notation","7",          "8",       "9",             "Divide",   "Power of Ten"),
+    ("Enter",              "Enter",      "Backspace","Clear",        "Square",   "Power"),
     ("?",                  "?",          "Negate",  "Sine",          "Cosine",   "Tangent"),
-    ("?",                  "?",          "Reciprocal","Arcsine",       "Arccosine","Arctangent")
+    ("?",                  "?",          "Reciprocal","Arcsine",     "Arccosine","Arctangent")
 )
 
 def main():
