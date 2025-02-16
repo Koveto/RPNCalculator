@@ -1,12 +1,55 @@
 """
 display.py
-12/30/2024
+2/11/2025
 Determine what to display to the LCD
+
+init(ROWS, COLUMNS)
+ROWS: Number of rows on LCD
+COLUMNS: Number of columns on LCD
+Prepares a blank output to the LCD
+
+get()
+Returns (x, y) where...
+x is x row to display
+ex. "X: 0            "
+y is y row to display
+ex. "Y: 0            "
+
+clear()
+Reset X and Y to 0
+
+numberPressed(digit)
+Append the number to the X row
+
+backspace()
+Remove the last digit from the X row
+
+enter()
+Push the X row to the stack
+
+add()
+Add X and Y rows, output to X
+
+sub()
+Subtract Y-X rows, output to X
+
+mul()
+Multiply X and Y rows, output to X
+
+div()
+Divide Y/X rows, output to X
+
+__abbreviate(s)
+s: String representing some number
+Return a shortened s using scientific notation
+
+__getXNumber()
+Convert x to a number and returns it
 """
 
 from stack import Stack
-from number import Number
 
+# Constants
 X_ON = "X: "
 X_OFF = "..."
 Y = "Y: "
@@ -15,68 +58,90 @@ class Display:
     def __init__(self, ROWS, COLUMNS):
         self.rows = ROWS
         self.cols = COLUMNS
-        self.x = "0.0000"
-        self.numX = Number(0)
-        self.y = "0.0000"
-        self.numY = Number(0)
+        self.x = 0
+        self.y = 0
+        self.xStr = "0"
         self.isOffScreen = False
         self.isTyping = False
         self.stack = Stack()
         
     def get( self ):
-        if (self.isOffScreen):
-            pre = X_OFF
-        else:
-            pre = X_ON
         if (self.isTyping):
-            post = "_"
+            uline = "_"
         else:
-            post = ""
-        return (pre + self.x + post, Y + self.y)
+            uline = ""
+        xToReturn = X_ON + self.xStr + uline + (" " * (len(X_ON + self.xStr + uline)))
+        yToReturn = Y + str(self.y) + (" " * (len(Y + str(self.y))))
+        return (xToReturn,yToReturn)
     
-    def __strNumber( self, number ):
-        s = str(number)
-        return s
+    def clear( self ):
+        self.x = 0
+        self.y = 0
+        self.stack = Stack()
     
-    """
-    Takes a single number 0-9. Where no underscore is
-    displayed, it starts a new number. Otherwise, it
-    determines how much to add to the existing number
-    depending on the decimal place. It updates the display
-    and calls formatNumber(True). Calls peek() to put the
-    top of the stack in Y. 
-    """
-    """def numberPressed(digit):
-        # A number is already in progress...
-        if isTyping:
-
-            # "X: 1_" -> "X: 1"
-            sub = t[:len(t) - 1]
-
-            # Decimal found! Figure out how much to add
-            if ("." in str(numX) or sub[len(sub) - 1] == "."):
-                if sub[len(sub) - 1] == ".":
-                    begin = len(t)
-                else:
-                    begin = str(numX).index(".")
-                end = len(str(numX)) - 1
-                dif = end - begin
-                numX += Decimal("0." + (dif * "0") + str(digit))
-
-            # No decimal. Multiply by ten and add new digit
+    def numberPressed( self, digit ):
+        if (self.isTyping):
+            if (self.x.is_integer()):
+                self.xStr += str(digit)
+                self.x = (self.x * 10) + digit
             else:
-                numX = (numX * Decimal(10)) + Decimal(str(digit))
-
-            # Update display
-            setTextX(formatNumber(True))
-
-        # New number
+                lastDigit = self.xStr[-1]
+                
         else:
-            #if (len(self.stack) != 0):
-            self.numX = Number(digit)
-            number = str(Decimal(peek()))
-            number = appendZeros(number)
-            setTextY("Y: " + number)
-            numX = Decimal(str(digit))
-            setTextX(formatNumber(True))
-        """
+            self.__push()
+            self.x = digit
+            self.xStr = str(digit)
+            self.isTyping = True
+    
+    def backspace( self ):
+        if (not self.isTyping):
+            self.x = 0
+            self.xStr = "0"
+            return
+        self.x = self.x // 10
+        self.xStr = self.xStr[:len(self.xStr)-1]
+    
+    def enter( self ):
+        self.__push()
+        self.x = 0
+        self.xStr = "0"
+        self.isTyping = False
+        
+    def add( self ):
+        self.x = self.y + self.x
+        self.__operation()
+        
+    def sub( self ):
+        self.x = self.y - self.x
+        self.__operation()
+        
+    def mul( self ):
+        self.x = self.y * self.x
+        self.__operation()
+        
+    def div( self ):
+        if (self.x == 0):
+            return
+        self.x = self.y / self.x
+        self.__operation()
+        
+    def __push( self ):
+        self.stack.push(self.x)
+        self.y = self.x
+    
+    def __operation( self ):
+        self.stack.pop()
+        if (self.stack.isEmpty()):
+            self.y = 0
+        else:
+            self.y = stack.peek()
+        self.xStr = str(self.x)
+        self.isTyping = False
+    
+    def __abbreviate( self, s ):
+        pass
+    
+    def __getXNumber( self ):
+        pass
+
+
