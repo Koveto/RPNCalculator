@@ -1,4 +1,15 @@
+"""
+calculator.py
+Kobe Goodwin
+
+Calculator for performing arithmetic and trigonometric operations,
+including support for complex numbers, using an LCD display for
+output visualization.
+"""
+
+
 import math
+import cmath
 from stack import Stack
 
 class Calculator:
@@ -17,6 +28,26 @@ class Calculator:
         # Initialize LCD display
         self.lcd.write_at(0, 0, "Y: 0.0000")
         self.lcd.write_at(0, 1, "X: 0.0000")
+
+    def handle_complex_number(self):
+        """
+        Handles complex number input by creating a complex number from the
+        top two numbers on the stack and updates the display.
+        """
+        if self.input_in_progress:
+            self.stack.push(float(self.current_input))
+            self.current_input = ""
+            self.input_in_progress = False
+        
+        if self.stack.size() < 2:
+            return
+
+        x = self.stack.pop()
+        y = self.stack.pop()
+        complex_number = complex(y, x)
+        self.stack.push(complex_number)
+        self.update_display()
+
 
     def handle_digit_input(self, digit):
         """
@@ -89,11 +120,10 @@ class Calculator:
             if len(self.current_input) > 1:
                 self.current_input = self.current_input[:-1]
             else:
-                self.current_input = "0"
+                self.current_input = ""
                 self.input_in_progress = False
         else:
-            self.current_input = "0"
-            self.input_in_progress = True
+            self.stack.pop()
         
         self.update_display()
 
@@ -248,6 +278,43 @@ class Calculator:
             self.stack.push(y)
         
         self.update_display()
+
+    def format_complex_number(self, cnum):
+        """
+        Formats a complex number as a string in rectangular form to fit within the lcd.columns - 3 length.
+        
+        Args:
+            cnum (complex): The complex number to format.
+            
+        Returns:
+            str: The formatted string representing the complex number.
+        """
+        max_length = self.lcd.columns - 3
+        real_part = f"{cnum.real:.2e}".replace("+", "")
+        imag_part = f"{cnum.imag:.2e}".replace("+", "")
+        
+        # Construct the full string
+        result = f"{real_part} + j{imag_part}"
+        
+        # Truncate to fit within max_length
+        if len(result) > max_length:
+            truncated_real = f"{cnum.real:.1e}".replace("+", "")
+            truncated_imag = f"{cnum.imag:.1e}".replace("+", "")
+            result = f"{truncated_real} + j{truncated_imag}"
+            if len(result) > max_length:
+                result = result.replace(".0","")
+                r = int(cnum.real)
+                i = int(cnum.imag)
+                truncated_real = f"{r:.0e}".replace("+","")
+                truncated_imag = f"{i:.0e}".replace("+","")
+                result = f"{truncated_real} + j{truncated_imag}"
+        
+        result = result[:max_length]
+        result += ' ' * (self.lcd.columns - 3 - len(result))
+        
+        return result
+    
+    
     
     def update_display(self):
         """
@@ -262,20 +329,28 @@ class Calculator:
             y_value = self.stack.stack[-1] if self.stack.size() > 0 else 0.0000
         else:
             x_value = self.stack.peek() if not self.stack.is_empty() else "0.0000"
-            x_display = f"X: {float(x_value):.4g}"  # Use general format for large/small numbers
+            if isinstance(x_value, complex):
+                # Format complex number for display
+                x_display = "X: " + self.format_complex_number(x_value)
+            else:
+                x_display = f"X: {float(x_value):.4g}"  # Use general format for large/small numbers
             y_value = self.stack.stack[-2] if self.stack.size() > 1 else 0.0000
 
         # Create strings with trailing spaces to ensure they are of length lcd.columns
-        y_display = f"Y: {y_value:.4g}"  # Use general format for large/small numbers
-        y_display += ' ' * (self.lcd.columns - len(y_display))
+        if isinstance(y_value, complex):
+            # Format complex number for display
+            y_display = "Y: " + self.format_complex_number(y_value)
+        else:
+            y_display = f"Y: {y_value:.4g}"  # Use general format for large/small numbers
+            y_display += ' ' * (self.lcd.columns - len(y_display))
 
         x_display += ' ' * (self.lcd.columns - len(x_display))
-
+        
+        
         # Write to the LCD
         self.lcd.write_at(0, 0, y_display)
         self.lcd.write_at(0, 1, x_display)
         
-        # For debugging purposes, print the stack
         print(self.stack)
 
 
