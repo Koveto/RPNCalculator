@@ -1,6 +1,6 @@
 """
 main.py
-2/13/2025 Kobe Goodwin
+2/25/2025 Kobe Goodwin
 
 Initializes I/O, polls button input, interprets presses, updates LCD.
 """
@@ -8,6 +8,7 @@ Initializes I/O, polls button input, interprets presses, updates LCD.
 from lcd import LCD
 from push_buttons import PushButtons
 from input_handler import InputHandler
+from button_labels import ButtonLabels
 from time import sleep_ms
 
 # Pinout assignment
@@ -16,19 +17,10 @@ COLUMNS = 16
 ROWS = 2
 SDA = 0
 SCL = 1
-
 # Button Array
 BUTTON_ROWS = [3, 4, 5, 6, 7, 8, 9]
 BUTTON_COLS = [10, 11, 12, 13, 14, 15]
-BUTTON_LIST = (
-    ("?",                  "Swap",       "0",       "Decimal Point", "Add",      "Natural Log"),
-    ("Complex Number",     "1",          "2",       "3",             "Subtract", "Exponential"),
-    ("?",                  "4",          "5",       "6",             "Multiply", "Logarithm"),
-    ("Scientific Notation","7",          "8",       "9",             "Divide",   "Power of Ten"),
-    ("Enter",              "Enter",      "Backspace","Clear",        "Square",   "Power"),
-    ("?",                  "?",          "Negate",  "Sine",          "Cosine",   "Tangent"),
-    ("?",                  "?",          "Reciprocal","Arcsine",     "Arccosine","Arctangent")
-)
+
 
 def main():
     """
@@ -38,7 +30,7 @@ def main():
     """
     # Initialize I/O
     lcd = LCD(COLUMNS, ROWS, SDA, SCL)
-    buttons = PushButtons(BUTTON_ROWS, BUTTON_COLS, BUTTON_LIST)
+    buttons = PushButtons(BUTTON_ROWS, BUTTON_COLS)
     handler = InputHandler(lcd)
     
     # Initial LCD output
@@ -49,18 +41,27 @@ def main():
     lcd.write_at(0, ROWS - 1, "X: 0")
     
     previous_press = None
+    button_mode = False
 
     # Main loop
     while True:
         button_press = buttons.get_button()
         
         if button_press and button_press != previous_press:
-            handler.interpret_button_press(button_press)
+            if (button_press == ButtonLabels.ALTERNATE_FUNCTIONS):
+                if (button_mode):
+                    new_buttons = ButtonLabels.BUTTON_LABELS_A
+                else:
+                    new_buttons = ButtonLabels.BUTTON_LABELS_B
+                buttons.set_key_list(new_buttons)
+            else:
+                handler.interpret_button_press(button_press)
             previous_press = button_press
         elif button_press is None:
             previous_press = None
             
         sleep_ms(100)
-        
-if __name__== "__main__":
+
+if __name__ == "__main__":
     main()
+

@@ -1,5 +1,17 @@
+"""
+calculator.py
+Kobe Goodwin
+
+Calculator for performing arithmetic and trigonometric operations,
+including support for complex numbers, using an LCD display for
+output visualization.
+"""
+
+
 import math
+import cmath
 from stack import Stack
+from button_labels import ButtonLabels as b
 
 class Calculator:
     def __init__(self, lcd):
@@ -17,6 +29,33 @@ class Calculator:
         # Initialize LCD display
         self.lcd.write_at(0, 0, "Y: 0.0000")
         self.lcd.write_at(0, 1, "X: 0.0000")
+
+    def handle_complex_number(self, update_display = True):
+        """
+        Handles complex number input by creating a complex number from the
+        top two numbers on the stack and updates the display.
+        
+        Args:
+        update_display (bool): A boolean representing whether to
+                                   update the display or not, typically
+                                   True.
+        """
+        if self.input_in_progress:
+            self.stack.push(float(self.current_input))
+            self.current_input = ""
+            self.input_in_progress = False
+        
+        if self.stack.size() < 2:
+            self.update_display()
+            return
+
+        x = self.stack.pop()
+        y = self.stack.pop()
+        complex_number = complex(y, x)
+        self.stack.push(complex_number)
+        if update_display:
+            self.update_display()
+
 
     def handle_digit_input(self, digit):
         """
@@ -52,9 +91,13 @@ class Calculator:
         
         self.update_display()
 
-    def calculate_result(self):
+    def calculate_result(self, update_display = True):
         """
-        Finalizes the current input, pushes it to the stack, and updates the LCD display.
+        Finalizes the current input, pushes it to the stack, and updates
+        the LCD display.
+        
+        Args:
+            update_display (bool): Whether to update the display or not. Default is True.
         """
         if self.current_input:
             try:
@@ -64,11 +107,12 @@ class Calculator:
                 self.update_display()
                 return
             self.current_input = ""
-        else:
+        elif not self.stack.is_empty():
             self.stack.push(self.stack.peek())
         
         self.input_in_progress = False
-        self.update_display()
+        if (update_display):
+            self.update_display()
 
     def clear_display(self):
         """
@@ -89,53 +133,81 @@ class Calculator:
             if len(self.current_input) > 1:
                 self.current_input = self.current_input[:-1]
             else:
-                self.current_input = "0"
+                self.current_input = ""
                 self.input_in_progress = False
         else:
-            self.current_input = "0"
-            self.input_in_progress = True
+            self.stack.pop()
         
         self.update_display()
-
-    def handle_operator_input(self, operator):
+        
+    def pi(self):
         """
-        Handles arithmetic operations using the top number on the stack (y)
-        and the current input number (x).
-
-        Args:
-            operator (str): A string representing the operation ("Add", "Subtract", "Multiply", "Divide").
+        Adds an approximation of pi to the top of the stack.
         """
-        if self.stack.is_empty():
-            y = 0.0
-        else:
-            y = self.stack.pop()
-        if self.current_input:
-            x = float(self.current_input)
-        else:
-            x = y
-            if self.stack.is_empty():
-                y = 0.0
-            else:
-                y = self.stack.pop()
-        result = None
-
-        if operator == "Add":
-            result = y + x
-        elif operator == "Subtract":
-            result = y - x
-        elif operator == "Multiply":
-            result = y * x
-        elif operator == "Divide":
-            if x != 0:
-                result = y / x
-
-        if result is not None:
-            self.stack.push(result)
+        self.calculate_result(update_display = False)
+        self.current_input = str(cmath.pi)
+        self.calculate_result()
+        
+    def split_complex_polar(self):
+        """
+        Pops top number from stack (or input).
+        Pushes Absolute Value then Angle
+        """
+        # unary_operation("Abs")
+        if not self.input_in_progress and self.stack.is_empty():
+            return
+        if self.input_in_progress:
+            self.stack.push(float(self.current_input))
             self.current_input = ""
             self.input_in_progress = False
-            self.update_display()
+        x = self.stack.pop() if not self.stack.is_empty() else 0.0
+        result = abs(x)
+        self.stack.push(result)
+        
+        # Get x to the top of the stack
+        self.input_in_progress = True
+        self.current_input = str(x)
+        if (type(x) == complex):
+            self.current_input = str(x.real)
+            self.calculate_result(update_display = False)
+            self.current_input = str(x.imag)
+            self.calculate_result(update_display = False)
+            self.handle_complex_number(update_display = False)
+            
+        self.unary_operation(b.ANGLE)
+        
+    def split_complex_rect(self):
+        """
+        Pops top number from stack (or input).
+        Pushes Rect then Imag
+        """
+        # unary_operation("Real")
+        if not self.input_in_progress and self.stack.is_empty():
+            return
+        if self.input_in_progress:
+            self.stack.push(float(self.current_input))
+            self.current_input = ""
+            self.input_in_progress = False
+        x = self.stack.pop() if not self.stack.is_empty() else 0.0
+        if (type(x) == complex):
+            result = x.real
+        else:
+            result = x
+        self.stack.push(result)
+        
+        # Get x to the top of the stack
+        self.input_in_progress = True
+        self.current_input = str(x)
+        if (type(x) == complex):
+            self.current_input = str(x.real)
+            self.calculate_result(update_display = False)
+            self.current_input = str(x.imag)
+            self.calculate_result(update_display = False)
+            self.handle_complex_number(update_display = False)
+            
+        self.unary_operation(b.IMAG)
 
-    def unary_operation(self, op):
+    def unary_operation(self, op, update_display = True):
         """
         Performs a unary operation on the top number on the stack.
 
@@ -143,7 +215,9 @@ class Calculator:
             op (str): A string representing the operation.
                       Valid operations are: "Natural Log", "Exponential", "Logarithm",
                       "Power of Ten", "Square", "Sine", "Cosine", "Tangent",
-                      "Arcsine", "Arccosine", "Arctangent", "Negate", "Reciprocal".
+                      "Arcsine", "Arccosine", "Arctangent", "Negate", "Reciprocal",
+                      "Conjugate", "Sqrt", "Abs", "Angle", "Real", "Imag"
+            update_display (bool): Whether to update the display or not. Default is True.
         """
         if not self.input_in_progress and self.stack.is_empty():
             return
@@ -156,45 +230,65 @@ class Calculator:
         x = self.stack.pop() if not self.stack.is_empty() else 0.0
         result = None
 
-        if op == "Natural Log":
+        if op == b.NATURAL_LOG:
             if x == 0.0:
                 self.stack.push(x)
                 return
             result = math.log(x)
-        elif op == "Exponential":
+        elif op == b.EXPONENTIAL:
             result = math.exp(x)
-        elif op == "Logarithm":
+        elif op == b.LOGARITHM:
             if x == 0.0:
                 self.stack.push(x)
                 return
             result = math.log10(x)
-        elif op == "Power of Ten":
+        elif op == b.POWER_OF_TEN:
             result = 10**x
-        elif op == "Square":
+        elif op == b.SQUARE:
             result = x**2
-        elif op == "Sine":
+        elif op == b.SQRT:
+            result = x ** (1/2)
+        elif op == b.SINE:
             result = math.sin(x)
-        elif op == "Cosine":
+        elif op == b.COSINE:
             result = math.cos(x)
-        elif op == "Tangent":
+        elif op == b.TANGENT:
             result = math.tan(x)
-        elif op == "Arcsine":
+        elif op == b.ARCSINE:
             result = math.asin(x)
-        elif op == "Arccosine":
+        elif op == b.ARCCOSINE:
             result = math.acos(x)
-        elif op == "Arctangent":
+        elif op == b.ARCTANGENT:
             result = math.atan(x)
-        elif op == "Negate":
+        elif op == b.NEGATE:
             result = -x
-        elif op == "Reciprocal":
+        elif op == b.CONJUGATE:
+            if (type(x) == complex):
+                result = complex(x.real, -x.imag)
+        elif op == b.RECIPROCAL:
             if (x == 0.0):
                 self.stack.push(x)
                 return
             result = 1 / x
+        elif op == b.ABS:
+            result = abs(x)
+        elif op == b.ANGLE:
+            cmath.phase(x)
+        elif op == b.REAL:
+            if (type(x) == complex):
+                result = x.real
+            else:
+                result = x
+        elif op == b.IMAG:
+            if (type(x) == complex):
+                result = x.imag
+            else:
+                result = 0.0
 
         if result is not None:
             self.stack.push(result)
-            self.update_display()
+            if update_display:
+                self.update_display()
             
     def binary_operation(self, op):
         """
@@ -213,18 +307,18 @@ class Calculator:
         y = self.stack.pop() if not self.stack.is_empty() else 0.0
         result = None
 
-        if op == "Add":
+        if op == b.ADD:
             result = y + x
-        elif op == "Subtract":
+        elif op == b.SUBTRACT:
             result = y - x
-        elif op == "Multiply":
+        elif op == b.MULTIPLY:
             result = y * x
-        elif op == "Divide":
+        elif op == b.DIVIDE:
             if x != 0:
                 result = y / x
-        elif op == "Power":
+        elif op == b.POWER:
             result = y**x
-        elif op == "Scientific Notation":
+        elif op == b.SCIENTIFIC_NOTATION:
             result = y * (10**x)
 
         if result is not None:
@@ -248,6 +342,49 @@ class Calculator:
             self.stack.push(y)
         
         self.update_display()
+
+    def format_complex_number(self, cnum):
+        """
+        Formats a complex number as a string in rectangular form to fit within the lcd.columns - 3 length.
+        
+        Args:
+            cnum (complex): The complex number to format.
+            
+        Returns:
+            str: The formatted string representing the complex number.
+        """
+        #print("Complex number! " + str(cnum))
+        max_length = self.lcd.columns - 3
+        real_part = f"{cnum.real:.2e}".replace("+", "")
+        imag_part = f"{cnum.imag:.2e}".replace("+", "")
+        
+        # Construct the full string
+        result = f"{real_part}+j{imag_part}"
+        #print("Initially... " + str(result))
+        
+        # Truncate to fit within max_length
+        if len(result) > max_length:
+            truncated_real = f"{cnum.real:.1e}".replace("+", "")
+            truncated_imag = f"{cnum.imag:.1e}".replace("+", "")
+            result = f"{truncated_real}+j{truncated_imag}"
+            #print("Rev 1... " + str(result))
+            """if len(result) > max_length:
+                result = result.replace(".0","")
+                r = int(cnum.real)
+                i = int(cnum.imag)
+                truncated_real = f"{r:.0e}".replace("+","")
+                truncated_imag = f"{i:.0e}".replace("+","")
+                result = f"{truncated_real}+j{truncated_imag}"
+                print("Rev 2... " + str(result))"""
+        
+        result = result[:max_length]
+        result += ' ' * (self.lcd.columns - 3 - len(result))
+        
+        #print("Display... " + str(result))
+        
+        return result
+    
+    
     
     def update_display(self):
         """
@@ -262,21 +399,31 @@ class Calculator:
             y_value = self.stack.stack[-1] if self.stack.size() > 0 else 0.0000
         else:
             x_value = self.stack.peek() if not self.stack.is_empty() else "0.0000"
-            x_display = f"X: {float(x_value):.4g}"  # Use general format for large/small numbers
+            if isinstance(x_value, complex):
+                # Format complex number for display
+                x_display = "X: " + self.format_complex_number(x_value)
+            else:
+                x_display = f"X: {float(x_value):.4g}"  # Use general format for large/small numbers
             y_value = self.stack.stack[-2] if self.stack.size() > 1 else 0.0000
 
         # Create strings with trailing spaces to ensure they are of length lcd.columns
-        y_display = f"Y: {y_value:.4g}"  # Use general format for large/small numbers
-        y_display += ' ' * (self.lcd.columns - len(y_display))
+        if isinstance(y_value, complex):
+            # Format complex number for display
+            y_display = "Y: " + self.format_complex_number(y_value)
+        else:
+            y_display = f"Y: {y_value:.4g}"  # Use general format for large/small numbers
+            y_display += ' ' * (self.lcd.columns - len(y_display))
 
         x_display += ' ' * (self.lcd.columns - len(x_display))
-
+        
+        
         # Write to the LCD
         self.lcd.write_at(0, 0, y_display)
         self.lcd.write_at(0, 1, x_display)
         
-        # For debugging purposes, print the stack
         print(self.stack)
+
+
 
 
 

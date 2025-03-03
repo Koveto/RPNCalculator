@@ -1,14 +1,15 @@
 """
 push_buttons.py
-2/12/2025 Kobe Goodwin
+2/25/2025 Kobe Goodwin
 
 Module for reading input from a push button array.
 """
 
 from machine import Pin
+from button_labels import ButtonLabels
 
 class PushButtons:
-    def __init__(self, rowPinNos, colPinNos, buttonList):
+    def __init__(self, rowPinNos, colPinNos):
         """
         Initializes the PushButtons class.
 
@@ -19,11 +20,17 @@ class PushButtons:
         """
         self.row_list = [Pin(pin, Pin.OUT) for pin in rowPinNos]
         self.col_list = [Pin(pin, Pin.IN, Pin.PULL_UP) for pin in colPinNos]
-        self.key_list = buttonList
+        self.key_list = ButtonLabels.BUTTON_LABELS_A
 
         # Set all row pins to high
         for row in self.row_list:
             row.value(1)
+
+    def set_key_list(self, key_list):
+        """
+        Mutator for key list. See button_labels.py
+        """
+        self.key_list = key_list
 
     def get_button(self):
         """
