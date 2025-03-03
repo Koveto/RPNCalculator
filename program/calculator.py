@@ -30,7 +30,6 @@ class Calculator:
         self.lcd.write_at(0, 0, "Y: 0.0000")
         self.lcd.write_at(0, 1, "X: 0.0000")
 
-<<<<<<< HEAD
     def handle_complex_number(self, update_display = True):
         """
         Handles complex number input by creating a complex number from the
@@ -40,12 +39,6 @@ class Calculator:
         update_display (bool): A boolean representing whether to
                                    update the display or not, typically
                                    True.
-=======
-    def handle_complex_number(self):
-        """
-        Handles complex number input by creating a complex number from the
-        top two numbers on the stack and updates the display.
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
         """
         if self.input_in_progress:
             self.stack.push(float(self.current_input))
@@ -53,22 +46,15 @@ class Calculator:
             self.input_in_progress = False
         
         if self.stack.size() < 2:
-<<<<<<< HEAD
             self.update_display()
-=======
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
             return
 
         x = self.stack.pop()
         y = self.stack.pop()
         complex_number = complex(y, x)
         self.stack.push(complex_number)
-<<<<<<< HEAD
         if update_display:
             self.update_display()
-=======
-        self.update_display()
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
 
 
     def handle_digit_input(self, digit):
@@ -367,54 +353,35 @@ class Calculator:
         Returns:
             str: The formatted string representing the complex number.
         """
-<<<<<<< HEAD
         #print("Complex number! " + str(cnum))
-=======
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
         max_length = self.lcd.columns - 3
         real_part = f"{cnum.real:.2e}".replace("+", "")
         imag_part = f"{cnum.imag:.2e}".replace("+", "")
         
         # Construct the full string
-<<<<<<< HEAD
         result = f"{real_part}+j{imag_part}"
         #print("Initially... " + str(result))
-=======
-        result = f"{real_part} + j{imag_part}"
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
         
         # Truncate to fit within max_length
         if len(result) > max_length:
             truncated_real = f"{cnum.real:.1e}".replace("+", "")
             truncated_imag = f"{cnum.imag:.1e}".replace("+", "")
-<<<<<<< HEAD
             result = f"{truncated_real}+j{truncated_imag}"
             #print("Rev 1... " + str(result))
             """if len(result) > max_length:
-=======
-            result = f"{truncated_real} + j{truncated_imag}"
-            if len(result) > max_length:
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
                 result = result.replace(".0","")
                 r = int(cnum.real)
                 i = int(cnum.imag)
                 truncated_real = f"{r:.0e}".replace("+","")
                 truncated_imag = f"{i:.0e}".replace("+","")
-<<<<<<< HEAD
                 result = f"{truncated_real}+j{truncated_imag}"
                 print("Rev 2... " + str(result))"""
-=======
-                result = f"{truncated_real} + j{truncated_imag}"
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
         
         result = result[:max_length]
         result += ' ' * (self.lcd.columns - 3 - len(result))
         
-<<<<<<< HEAD
         #print("Display... " + str(result))
         
-=======
->>>>>>> cc8b0100315e42be9be683419d94f8eeba420ad0
         return result
     
     
