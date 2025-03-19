@@ -202,4 +202,3 @@ class LcdApi:
         """Sleep for some time (given in microseconds)."""
         time.sleep_us(usecs)
 
-

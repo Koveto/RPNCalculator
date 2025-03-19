@@ -62,7 +62,7 @@ class ButtonLabels:
                        ROW_7_A)
     
     ROW_7_B = (IMAG,                 REAL,    RECIPROCAL, ARCSINE,       ARCCOSINE,    ARCTANGENT)
-    ROW_6_B = (SPLIT_COMPLEX_POLAR,  PI,      SWAP,       SINE,          COSINE,       TANGENT)
+    ROW_6_B = (SPLIT_COMPLEX_POLAR,  SQRT,    SWAP,       SINE,          COSINE,       TANGENT)
     ROW_5_B = (ENTER,                ENTER,   BACKSPACE,  CLEAR,         SQUARE,       POWER)
     ROW_4_B = (SCIENTIFIC_NOTATION,  SEVEN,   EIGHT,      NINE,          DIVIDE,       POWER_OF_TEN)
     ROW_3_B = (CONJUGATE,            FOUR,    FIVE,       SIX,           MULTIPLY,     LOGARITHM)

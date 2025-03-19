@@ -9,6 +9,7 @@ from lcd import LCD
 from push_buttons import PushButtons
 from input_handler import InputHandler
 from button_labels import ButtonLabels
+from machine import Pin
 from time import sleep_ms
 
 # Pinout assignment
@@ -39,10 +40,10 @@ def main():
     
     # Initial LCD output
     if ROWS == 4:
-        lcd.write_at(0, 0, "rpnCalculator.py")
-        lcd.write_at(0, 1, "Kobe Goodwin")
-    lcd.write_at(0, ROWS - 2, "Y: 0")
-    lcd.write_at(0, ROWS - 1, "X: 0")
+        lcd.write_at(0, 0, "D: 0")
+        lcd.write_at(0, 1, "C: 0")
+    lcd.write_at(0, ROWS - 2, "B: 0")
+    lcd.write_at(0, ROWS - 1, "A: 0")
     
     previous_press = None
     button_mode = False
@@ -50,22 +51,30 @@ def main():
     # Main loop
     while True:
         button_press = buttons.get_button()
-        
         if button_press and button_press != previous_press:
             if (button_press == ButtonLabels.ALTERNATE_FUNCTIONS):
                 if (button_mode):
                     new_buttons = ButtonLabels.BUTTON_LABELS_A
                 else:
                     new_buttons = ButtonLabels.BUTTON_LABELS_B
+                button_mode = not button_mode
                 buttons.set_key_list(new_buttons)
             else:
+                if (button_mode):
+                    button_mode = False
+                    buttons.set_key_list(ButtonLabels.BUTTON_LABELS_A)
                 handler.interpret_button_press(button_press)
             previous_press = button_press
         elif button_press is None:
             previous_press = None
+        if (button_mode):
+            lcd.write_at(lcd.columns - 3, 0, "2nd")
+        else:
+            lcd.write_at(lcd.columns - 3, 0, "   ")
             
         sleep_ms(100)
 
 if __name__ == "__main__":
     main()
+
 

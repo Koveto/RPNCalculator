@@ -273,7 +273,7 @@ class Calculator:
         elif op == b.ABS:
             result = abs(x)
         elif op == b.ANGLE:
-            cmath.phase(x)
+            result = cmath.phase(x)
         elif op == b.REAL:
             if (type(x) == complex):
                 result = x.real

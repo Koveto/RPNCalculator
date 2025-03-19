@@ -1,6 +1,6 @@
 """
 stack.py
-2/13/2025 Kobe Goodwin
+3/13/2025 Kobe Goodwin
 
 Last-in First-out (LIFO) container.
 """
@@ -69,4 +69,18 @@ class Stack:
             str: The stack as a string
         """
         return str(self.stack)
+
+    def __add__(self, other):
+        """
+        Creates a Stack where other is on bottom
+        
+        Returns:
+            Stack: New stack with other on bottom
+        """
+        result = Stack()
+        result.push(other)
+        for i in self.stack:
+            result.push(i)
+        return result
+
 

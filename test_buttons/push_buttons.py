@@ -39,13 +39,14 @@ class PushButtons:
         Returns:
             str: The identifier of the pressed button, or None if no button is pressed.
         """
+        print()
         for row in self.row_list:
             row.value(0)  # Set the current row to low
             result = [col.value() for col in self.col_list]
+            print(result)
             if 0 in result:  # Check if any button in the current row is pressed
                 button = self.key_list[self.row_list.index(row)][result.index(0)]
                 row.value(1)  # Reset the row to high
                 return button
             row.value(1)
         return None
-

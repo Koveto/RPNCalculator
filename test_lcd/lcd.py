@@ -56,4 +56,3 @@ class LCD:
         self.lcd.move_to(x, y)
         self.lcd.putstr(string)
 
-

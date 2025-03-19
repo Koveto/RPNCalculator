@@ -1,22 +1,14 @@
 """
 main.py
-2/25/2025 Kobe Goodwin
+3/3/2025 Kobe Goodwin
 
-Initializes I/O, polls button input, interprets presses, updates LCD.
+BUTTON TEST PROGRAM
 """
 
-from lcd import LCD
 from push_buttons import PushButtons
-from input_handler import InputHandler
 from button_labels import ButtonLabels
 from time import sleep_ms
 
-# Pinout assignment
-# LCD
-COLUMNS = 16
-ROWS = 2
-SDA = 0
-SCL = 1
 # Button Array
 BUTTON_ROWS = [3, 4, 5, 6, 7, 8, 9]
 BUTTON_COLS = [10, 11, 12, 13, 14, 15]
@@ -29,16 +21,7 @@ def main():
     the LCD with new output.
     """
     # Initialize I/O
-    lcd = LCD(COLUMNS, ROWS, SDA, SCL)
     buttons = PushButtons(BUTTON_ROWS, BUTTON_COLS)
-    handler = InputHandler(lcd)
-    
-    # Initial LCD output
-    if ROWS == 4:
-        lcd.write_at(0, 0, "rpnCalculator.py")
-        lcd.write_at(0, 1, "Kobe Goodwin")
-    lcd.write_at(0, ROWS - 2, "Y: 0")
-    lcd.write_at(0, ROWS - 1, "X: 0")
     
     previous_press = None
     button_mode = False
@@ -53,10 +36,11 @@ def main():
                     new_buttons = ButtonLabels.BUTTON_LABELS_A
                 else:
                     new_buttons = ButtonLabels.BUTTON_LABELS_B
-                button_mode = not button_mode
                 buttons.set_key_list(new_buttons)
+                button_mode = not button_mode
+                print(ButtonLabels.ALTERNATE_FUNCTIONS)
             else:
-                handler.interpret_button_press(button_press)
+                print(button_press)
             previous_press = button_press
         elif button_press is None:
             previous_press = None
@@ -65,4 +49,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
