@@ -7,11 +7,19 @@ including support for complex numbers, using an LCD display for
 output visualization.
 """
 
-
 import math
 import cmath
 from stack import Stack
 from button_labels import ButtonLabels as b
+import config
+
+class CustomError(Exception):
+    pass
+
+class UndefinedError(CustomError):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
 
 class Calculator:
     def __init__(self, lcd):
@@ -26,13 +34,19 @@ class Calculator:
         self.current_input = ""
         self.input_in_progress = False
         self.store = None
+        self.just_pressed_enter= False
 
         # Initialize LCD display
-        if (self.lcd.rows == 4):
-            self.lcd.write_at(0, lcd.rows - 4, "D: 0")
-            self.lcd.write_at(0, lcd.rows - 3, "C: 0")
-        self.lcd.write_at(0, lcd.rows - 2, "B: 0")
-        self.lcd.write_at(0, lcd.rows - 1, "A: 0")
+        if (config.orient_top_bottom):
+            self.lcd.write_at(0, 0, "A: 0")
+            self.lcd.write_at(0, 1, "B: 0")
+            self.lcd.write_at(0, 2, "C: 0")
+            self.lcd.write_at(0, 3, "D: 0") 
+        else:
+            self.lcd.write_at(0, 0, "D: 0")
+            self.lcd.write_at(0, 1, "C: 0")
+            self.lcd.write_at(0, 2, "B: 0")
+            self.lcd.write_at(0, 3, "A: 0")
         
     def roll(self):
         """
@@ -50,7 +64,10 @@ class Calculator:
         self._complete_input()
         if (not self.stack.is_empty()):
             self.store = self.stack.peek()
-            self.lcd.write_at(10, self.lcd.rows - 1, "Stored")
+            if (config.orient_top_bottom):
+                self.lcd.write_at(10, self.lcd_rows - 3, "Stored")
+            else:
+                self.lcd.write_at(10, self.lcd.rows - 1, "Stored")
         
     def recall_number(self):
         """
@@ -68,25 +85,35 @@ class Calculator:
         Args:
         polar (bool): True for interpreting Y<X. False for Y+jX
         """
-        self._complete_input()
         
-        if self.stack.size() < 2:
-            return
+        if self.stack.size() == 0:
+            self.stack.push(0.0)
+        
+        self._complete_input()
 
         x = self.stack.pop()
-        y = self.stack.pop()
+        y = self.stack.peek()
         if (polar):
-            if (type(x) == complex):
-                real = y * cmath.cos(x*math.pi/180)
+            if (config.degrees):
+                if (type(x) == complex):
+                    real = y * cmath.cos(x*math.pi/180)
+                else:
+                    real = y * math.cos(x*math.pi/180)
+                if (type(y) == complex):
+                    imag = y * cmath.sin(x*math.pi/180)
+                else:
+                    imag = y * math.sin(x*math.pi/180)
+                complex_number = complex(real, imag)
             else:
-                real = y * math.cos(x*math.pi/180)
-            if (type(y) == complex):
-                imag = y * cmath.sin(x*math.pi/180)
-            else:
-                imag = y * math.sin(x*math.pi/180)
-            complex_number = complex(real, imag)
-            print(real)
-            print(imag)
+                if (type(x) == complex):
+                    real = y * cmath.cos(x)
+                else:
+                    real = y * math.cos(x)
+                if (type(y) == complex):
+                    imag = y * cmath.sin(x)
+                else:
+                    imag = y * math.sin(x)
+                complex_number = complex(real, imag)
         else:
             complex_number = complex(y, x)
         self.stack.push(complex_number)
@@ -110,7 +137,12 @@ class Calculator:
                 self.stack.push(float(self.current_input))
                 self.current_input = digit
             else:
-                self.current_input = digit
+                if (self.just_pressed_enter):
+                    self.stack.pop()
+                if (digit == b.E):
+                    self.current_input = "1E"
+                else:
+                    self.current_input = digit
             self.input_in_progress = True
 
     def add_decimal_point(self):
@@ -133,6 +165,9 @@ class Calculator:
         """
         if self.current_input:
             try:
+                if self.current_input == "1E":
+                    self.current_input = "1"
+                self.stack.push(float(self.current_input))
                 self.stack.push(float(self.current_input))
             except ValueError:
                 self.current_input = ""
@@ -150,11 +185,26 @@ class Calculator:
         self.stack = Stack()
         self.current_input = ""
         self.input_in_progress = False
-        if (self.lcd.rows == 4):
+        if (config.orient_top_bottom):
+            self.lcd.write_at(0, self.lcd.rows - 4, "A: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 3, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 2, "C: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 1, "D: 0" + (" " * (self.lcd.columns - 4)))
+        else:
             self.lcd.write_at(0, self.lcd.rows - 4, "D: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, self.lcd.rows - 3, "C: 0" + (" " * (self.lcd.columns - 4)))
-        self.lcd.write_at(0, self.lcd.rows - 2, "B: 0" + (" " * (self.lcd.columns - 4)))
-        self.lcd.write_at(0, self.lcd.rows - 1, "A: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 2, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 1, "A: 0" + (" " * (self.lcd.columns - 4)))
+        if (config.orient_top_bottom):
+            self.lcd.write_at(0, 0, "A: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 1, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 2, "C: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 3, "D: 0" + (" " * (self.lcd.columns - 4)))
+        else:
+            self.lcd.write_at(0, 0, "D: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 1, "C: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 2, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 3, "A: 0" + (" " * (self.lcd.columns - 4)))
 
     def delete_last_input(self):
         """
@@ -167,16 +217,17 @@ class Calculator:
             else:
                 self.current_input = ""
                 self.input_in_progress = False
+                self.stack.push(0.0)
         else:
             self.stack.pop()
+            self.stack.push(0.0)
         
     def pi(self):
         """
         Adds an approximation of pi to the top of the stack.
         """
-        self.calculate_result()
-        self.current_input = str(cmath.pi)
-        self.calculate_result()
+        self._complete_input()
+        self.stack.push(cmath.pi)
         
     def sum_function(self, subtract=False):
         """
@@ -188,8 +239,8 @@ class Calculator:
         list_stack = []
         while (not self.stack.is_empty()):
             list_stack += [self.stack.pop()]
-        result = list_stack[0]
-        for i in range(1,len(list_stack)):
+        result = list_stack[-1]
+        for i in range(0,len(list_stack)-1):
             if subtract:
                 result -= list_stack[i]
             else:
@@ -222,6 +273,11 @@ class Calculator:
             self.handle_complex_number()
             
         self.unary_operation(b.ANGLE)
+        
+        if (config.degrees):
+            n = self.stack.pop()
+            n = n * 180 / math.pi
+            self.stack.push(n)
         
     def split_complex_rect(self):
         """
@@ -260,10 +316,11 @@ class Calculator:
                       Valid operations are: "Natural Log", "Exponential", "Logarithm",
                       "Power of Ten", "Square", "Sine", "Cosine", "Tangent",
                       "Arcsine", "Arccosine", "Arctangent", "Negate", "Reciprocal",
-                      "Conjugate", "Sqrt", "Abs", "Angle", "Real", "Imag"
+                      "Conjugate", "Sqrt", "Abs", "Angle", "Real", "Imag", 
+                      "Deg", "Rad"
         """
         if not self.input_in_progress and self.stack.is_empty():
-            return
+            self.stack.push(0.0)
         
         if (op == b.NEGATE) and \
            (self.current_input != "") and \
@@ -274,14 +331,39 @@ class Calculator:
 
         self._complete_input()
         
+        if (((op == b.ARCSINE) or (op == b.ARCCOSINE)) and \
+            ((type(self.stack.peek()) is complex))):
+            raise UndefinedError("Domain error asin/acos")
+        
+        if (config.degrees and (op == b.TANGENT) and (self.stack.peek() % 180 == 90)) or \
+           (not config.degrees and (op == b.TANGENT) and \
+            (abs((self.stack.peek() % math.pi) - (math.pi / 2)) < 1e-6)):
+            raise UndefinedError("Tan(90 deg) undefined")
+        
+        if (((op == b.ARCSINE) or (op == b.ARCCOSINE)) and \
+            ((self.stack.peek() > 1) or (self.stack.peek() < -1))):
+            raise UndefinedError("Domain error asin/acos")
+        
+        
+        
         x = self.stack.pop() if not self.stack.is_empty() else 0.0
         result = None
+        
+        if (config.degrees and \
+            (op == b.SINE or op == b.COSINE or op == b.TANGENT)):
+            x = x * math.pi / 180
 
-        if op == b.NATURAL_LOG:
+        if op == b.DEG:
+            result = x * 180 / math.pi
+        elif op == b.RAD:
+            result = x * math.pi / 180
+        elif op == b.NATURAL_LOG:
             if x == 0.0:
                 self.stack.push(x)
                 return
             if (type(x) == complex):
+                result = cmath.log(x)
+            elif (x < 0.0):
                 result = cmath.log(x)
             else:
                 result = math.log(x)
@@ -294,7 +376,12 @@ class Calculator:
             if x == 0.0:
                 self.stack.push(x)
                 return
-            result = math.log10(x)
+            if (type(x) == complex):
+                result = cmath.log10(x)            
+            elif (x < 0.0):
+                result = cmath.log10(x)
+            else:
+                result = math.log10(x)
         elif op == b.POWER_OF_TEN:
             result = 10**x
         elif op == b.SQUARE:
@@ -363,6 +450,10 @@ class Calculator:
                 result = x.imag
             else:
                 result = 0.0
+    
+        if (config.degrees and \
+            (op == b.ARCSINE or op == b.ARCCOSINE or op == b.ARCTANGENT)):
+            result = result * 180 / math.pi
 
         if result is not None:
             self.stack.push(result)
@@ -373,12 +464,20 @@ class Calculator:
 
         Args:
             op (str): A string representing the operation.
-                      Valid operations are: "Add", "Subtract", "Multiply", "Divide", "Power", "Scientific Notation".
+                      Valid operations are: "Add", "Subtract", "Multiply", "Divide", "Power", "Scientific Notation"
+                      "PERCENT.
         """
+        was_in_progress = self.input_in_progress
         self._complete_input()
         
         x = self.stack.pop() if not self.stack.is_empty() else 0.0
         y = self.stack.pop() if not self.stack.is_empty() else 0.0
+        if not was_in_progress and \
+           op == b.POWER:
+            self.stack.push(y)
+        
+        #self.stack.pop()
+        
         result = None
 
         if op == b.ADD:
@@ -388,12 +487,18 @@ class Calculator:
         elif op == b.MULTIPLY:
             result = y * x
         elif op == b.DIVIDE:
-            if x != 0:
-                result = y / x
+            if x == 0:
+                self.stack.push(y)
+                self.stack.push(x)
+            result = y / x
         elif op == b.POWER:
+            #self.stack.push(y)
             result = y**x
         elif op == b.SCIENTIFIC_NOTATION:
             result = y * (10**x)
+        elif op == b.PERCENT:
+            result = y / (100*x)
+            self.stack.push(y)
 
         if result is not None:
             self.stack.push(result)
@@ -410,63 +515,92 @@ class Calculator:
             y = self.stack.pop()
             self.stack.push(x)
             self.stack.push(y)
-    
+            
+    def _shorten_format(self, part1, part2):
+        max_length = self.lcd.columns - 3
+        result = ""
+        if abs(part1) < 1e4 and abs(part1) > 1e-4:
+            real_part = f"{part1:.4f}".rstrip('0').rstrip('.')
+        else:
+            if (abs(part1) % 1) == 0:
+                real_part = f"{part1}".replace(".0","")
+            else:
+                real_part = f"{part1:.1e}".replace("+", "")
+
+        if abs(part2) < 1e4 and abs(part2) > 1e-4:
+            imag_part = f"{part2:.4f}".rstrip('0').rstrip('.')
+        else:
+            imag_part = f"{part2:.1e}".replace("+", "")
+
+        # Construct the full string in rectangular form
+        if (config.polar):
+            if part2 < 0:
+                imag_part = imag_part[1:]  # Remove the negative sign in the imaginary part
+                result = f"{real_part} < -{imag_part}"
+            else:
+                result = f"{real_part} <  {imag_part}"
+        else:
+            if part2 < 0:
+                imag_part = imag_part[1:]  # Remove the negative sign in the imaginary part
+                result = f"{real_part} - j{imag_part}"
+            else:
+                result = f"{real_part} + j{imag_part}"
+
+        # Ensure the result fits within max_length
+        if len(result) > max_length:
+            # Modify to truncate decimal point and digits after it in scientific notation
+            if "e" in real_part:
+                real_base, real_exp = real_part.split("e")
+                real_part = f"{real_base.split('.')[0]}e{real_exp}"
+            if "e" in imag_part:
+                imag_base, imag_exp = imag_part.split("e")
+                imag_part = f"{imag_base.split('.')[0]}e{imag_exp}"
+
+            # Reconstruct the result after truncation
+            if (config.polar):
+                if part2 < 0:
+                    result = f"{real_part} < -{imag_part}"
+                else:
+                    result = f"{real_part} <  {imag_part}"
+            else:
+                if part2 < 0:
+                    result = f"{real_part} - j{imag_part}"
+                else:
+                    result = f"{real_part} + j{imag_part}"
+        return result
+
     def format_complex_number(self, cnum):
         """
-        Formats a complex number as a string in rectangular form to fit within the lcd.columns - 3 length.
+        Formats a complex number as a string in rectangular or polar form to fit within the lcd.columns - 3 length.
         
         Args:
             cnum (complex): The complex number to format.
+            config: Configuration object containing the 'polar' boolean attribute.
             
         Returns:
             str: The formatted string representing the complex number.
         """
         max_length = self.lcd.columns - 3
-        
-        # Format real and imaginary parts
-        if abs(cnum.real) < 1e4 and abs(cnum.real) > 1e-4:
-            real_part = f"{cnum.real:.4f}".rstrip('0').rstrip('.')
-        else:
-            real_part = f"{cnum.real:.1e}".replace("+", "")
-        
-        if abs(cnum.imag) < 1e4 and abs(cnum.imag) > 1e-4:
-            imag_part = f"{cnum.imag:.4f}".rstrip('0').rstrip('.')
-        else:
-            imag_part = f"{cnum.imag:.1e}".replace("+", "")
-        
-        # Construct the full string
-        if cnum.imag < 0:
-            imag_part = imag_part[1:]
-            result = f"{real_part} - j{imag_part}"
-        else:
-            result = f"{real_part} + j{imag_part}"
-        
-        # Truncate to fit within max_length
-        if len(result) > max_length:
-            if abs(cnum.real) < 1e4 and abs(cnum.real) > 1e-4:
-                truncated_real = f"{cnum.real:.1f}".rstrip('0').rstrip('.')
-            else:
-                truncated_real = f"{cnum.real:.1e}".replace("+", "")
-            
-            if abs(cnum.imag) < 1e4 and abs(cnum.imag) > 1e-4:
-                truncated_imag = f"{cnum.imag:.1f}".rstrip('0').rstrip('.')
-            else:
-                truncated_imag = f"{cnum.imag:.1e}".replace("+", "")
-            
-            if cnum.imag < 0:
-                truncated_imag = truncated_imag[1:]
-                result = f"{truncated_real}-j{truncated_imag}"
-            else:
-                result = f"{truncated_real}+j{truncated_imag}"
+        part1 = cnum.real
+        part2 = cnum.imag
+        if (config.polar):
+            part1 = abs(cnum)
+            part2 = math.atan2(cnum.imag, cnum.real)
+            if (config.degrees):
+                part2 = part2 * 180 / math.pi
+        result = self._shorten_format(part1, part2)
         
         result = result[:max_length]
         result += ' ' * (self.lcd.columns - 3 - len(result))
         
-        return result 
+        return result
+
     
     
     def _complete_input(self):
         if self.input_in_progress:
+            if self.current_input[-1] == "E":
+                self.current_input = self.current_input[:len(self.current_input) - 1]
             self.stack.push(float(self.current_input))
             self.current_input = ""
             self.input_in_progress = False
@@ -490,7 +624,7 @@ class Calculator:
                 # Format complex number for display
                 a_display = "A: " + self.format_complex_number(a_value)
             else:
-                a_display = f"A: {float(a_value):.4g}"  # Use general format for large/small numbers
+                a_display = f"A: {float(a_value):.8g}"  # Use general format for large/small numbers
             b_value = self.stack.stack[-2] if self.stack.size() > 1 else 0.0000
             c_value = self.stack.stack[-3] if self.stack.size() > 2 else 0.0000
             d_value = self.stack.stack[-4] if self.stack.size() > 3 else 0.0000
@@ -499,30 +633,37 @@ class Calculator:
             # Format complex number for display
             b_display = "B: " + self.format_complex_number(b_value)
         else:
-            b_display = f"B: {b_value:.4g}"  # Use general format for large/small numbers
+            b_display = f"B: {b_value:.8g}"  # Use general format for large/small numbers
             b_display += ' ' * (self.lcd.columns - len(b_display))
         if isinstance(c_value, complex):
             # Format complex number for display
             c_display = "C: " + self.format_complex_number(c_value)
         else:
-            c_display = f"C: {c_value:.4g}"  # Use general format for large/small numbers
+            c_display = f"C: {c_value:.8g}"  # Use general format for large/small numbers
             c_display += ' ' * (self.lcd.columns - len(c_display))
         if isinstance(d_value, complex):
             # Format complex number for display
             d_display = "D: " + self.format_complex_number(d_value)
         else:
-            d_display = f"D: {d_value:.4g}"  # Use general format for large/small numbers
+            d_display = f"D: {d_value:.8g}"  # Use general format for large/small numbers
             d_display += ' ' * (self.lcd.columns - len(d_display))
+        d_display = d_display[:11]
 
         a_display += ' ' * (self.lcd.columns - len(a_display))
         
         
         # Write to the LCD
-        if (self.lcd.rows == 4):
-            self.lcd.write_at(0, self.lcd.rows - 4, d_display)
-            self.lcd.write_at(0, self.lcd.rows - 3, c_display)
-        self.lcd.write_at(0, self.lcd.rows - 2, b_display)
-        self.lcd.write_at(0, self.lcd.rows - 1, a_display)
+        if (config.orient_top_bottom):
+            self.lcd.write_at(0, 0, a_display)
+            self.lcd.write_at(0, 1, b_display)
+            self.lcd.write_at(0, 2, c_display)
+            self.lcd.write_at(0, 3, d_display)
+        else:
+            self.lcd.write_at(0, 0, d_display)
+            self.lcd.write_at(0, 1, c_display)
+            self.lcd.write_at(0, 2, b_display)
+            self.lcd.write_at(0, 3, a_display)
+
 
 
 

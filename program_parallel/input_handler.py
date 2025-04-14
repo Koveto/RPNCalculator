@@ -1,6 +1,6 @@
 """
 input_handler.py
-2/25/2025 Kobe Goodwin
+Kobe Goodwin
 
 Contains the InputHandler class.
 
@@ -10,7 +10,9 @@ Calls appropriate functions based on button labels.
 """
 
 from calculator import Calculator
+from calculator import UndefinedError
 from button_labels import ButtonLabels as b
+import config
 
 class InputHandler:
     def __init__(self, lcd):
@@ -33,8 +35,9 @@ class InputHandler:
         unary_buttons = {b.SINE, b.COSINE, b.TANGENT, b.ARCSINE, b.ARCCOSINE, b.ARCTANGENT,
                          b.LOGARITHM, b.NATURAL_LOG, b.NEGATE, b.RECIPROCAL, b.EXPONENTIAL,
                          b.SQUARE, b.POWER_OF_TEN, b.CONJUGATE, b.SQRT, b.ABS, b.ANGLE,
-                         b.REAL, b.IMAG}
-        binary_buttons = {b.ADD, b.SUBTRACT, b.MULTIPLY, b.DIVIDE, b.POWER, b.SCIENTIFIC_NOTATION}
+                         b.REAL, b.IMAG, b.DEG, b.RAD}
+        binary_buttons = {b.ADD, b.SUBTRACT, b.MULTIPLY, b.DIVIDE, b.POWER,
+                          b.SCIENTIFIC_NOTATION, b.PERCENT}
         digit_buttons = {b.ZERO, b.ONE, b.TWO, b.THREE, b.FOUR, b.FIVE, b.SIX, b.SEVEN, b.EIGHT, b.NINE, b.E}
 
         try:
@@ -58,6 +61,7 @@ class InputHandler:
 
             elif button_label == b.ENTER:
                 self.calculator.calculate_result()
+                self.calculator.just_pressed_enter = True
             elif button_label == b.CLEAR:
                 self.calculator.clear_display()
             elif button_label == b.BACKSPACE:
@@ -78,8 +82,38 @@ class InputHandler:
             elif button_label == b.ROLL:
                 self.calculator.roll()
                 
+            elif button_label == b.RADDEG:
+                config.degrees = not config.degrees
+            elif button_label == b.RECPOL:
+                config.polar = not config.polar
+            elif button_label == b.ORIENT:
+                config.orient_top_bottom = not config.orient_top_bottom
+                
+            if (button_label != b.ENTER and \
+                self.calculator.just_pressed_enter):
+                self.calculator.just_pressed_enter = False
             self.calculator.update_display()
+
+        except ZeroDivisionError as zde:
+            if config.orient_top_bottom:
+                r = self.lcd.rows - 2
+            else:
+                r = self.lcd.rows - 3
+            self.lcd.write_at(0, r, "Divide by zero error")
+            print(f"Error: {zde}")
+        except UndefinedError as ue:
+            if config.orient_top_bottom:
+                r = self.lcd.rows - 2
+            else:
+                r = self.lcd.rows - 3
+            self.lcd.write_at(0, r, "Undefined error     ")
+            print(f"Error: {ue}")
         except Exception as e:
-            self.lcd.write_at(0, self.lcd.rows - 1, "A: ERROR!           ")
+            if config.orient_top_bottom:
+                r = self.lcd.rows - 2
+            else:
+                r = self.lcd.rows - 3
+            self.lcd.write_at(0, r, "ERROR!              ")
             print(f"Error: {e}")
+
 

@@ -51,6 +51,12 @@ class ButtonLabels:
     STO = "Store"
     RCL = "Recall"
     ROLL = "Roll"
+    ORIENT = "Orientation"
+    PERCENT = "Percent"
+    DEG = "Degrees"
+    RAD = "Radians"
+    RADDEG = "Radians Degrees"
+    RECPOL = "Rectangular Polar"
     
     ROW_7_A = (SUM_PLUS,             RECIPROCAL,      SQRT,          LOGARITHM,       NATURAL_LOG,    SPLIT_COMPLEX_RECT)
     ROW_6_A = (STO,                  RCL,             ROLL,          SINE,            COSINE,         TANGENT)
@@ -58,7 +64,7 @@ class ButtonLabels:
     ROW_4_A = (ABS,                  SEVEN,           EIGHT,         NINE,            DIVIDE,         None)
     ROW_3_A = (ANGLE,                FOUR,            FIVE,          SIX,             MULTIPLY,       None)
     ROW_2_A = (ALTERNATE_FUNCTIONS,  ONE,             TWO,           THREE,           SUBTRACT,       None)
-    ROW_1_A = (SCIENTIFIC_NOTATION,  ZERO,            DECIMAL_POINT, None,            ADD,            None)
+    ROW_1_A = (RADDEG,               ZERO,            DECIMAL_POINT, COMPLEX_POLAR,   ADD,            None)
 
     BUTTON_LABELS_A = (ROW_1_A,\
                        ROW_2_A,\
@@ -68,13 +74,13 @@ class ButtonLabels:
                        ROW_6_A,\
                        ROW_7_A)
     
-    ROW_7_B = (SUM_MINUS,            POWER,           SQUARE,        POWER_OF_TEN,    EXPONENTIAL,    SPLIT_COMPLEX_POLAR)
-    ROW_6_B = (COMPLEX_NUMBER,       RCL,             PI,            ARCSINE,         ARCCOSINE,      ARCTANGENT)
-    ROW_5_B = (ENTER,                ENTER,           SWAP,          NEGATE,          E,              CLEAR)
-    ROW_4_B = (REAL,                 SEVEN,           EIGHT,         NINE,            DIVIDE,         None)
-    ROW_3_B = (IMAG,                 FOUR,            FIVE,          SIX,             MULTIPLY,       None)
-    ROW_2_B = (ALTERNATE_FUNCTIONS,  ONE,             TWO,           THREE,           SUBTRACT,       None)
-    ROW_1_B = (CONJUGATE,            ZERO,            DECIMAL_POINT, COMPLEX_POLAR,   ADD,            None)
+    ROW_7_B = (SUM_MINUS,            POWER,           SQUARE,        POWER_OF_TEN,    EXPONENTIAL,               SPLIT_COMPLEX_POLAR)
+    ROW_6_B = (COMPLEX_NUMBER,       PERCENT,         PI,            ARCSINE,         ARCCOSINE,                 ARCTANGENT)
+    ROW_5_B = (ENTER,                ENTER,           SWAP,          NEGATE,          SCIENTIFIC_NOTATION,       CLEAR)
+    ROW_4_B = (REAL,                 SEVEN,           EIGHT,         NINE,            DIVIDE,                    None)
+    ROW_3_B = (IMAG,                 FOUR,            FIVE,          SIX,             MULTIPLY,                  None)
+    ROW_2_B = (ALTERNATE_FUNCTIONS,  ONE,             TWO,           THREE,           SUBTRACT,                  None)
+    ROW_1_B = (RECPOL,               DEG,             RAD,           CONJUGATE,       ORIENT,                    None)
 
     BUTTON_LABELS_B = (ROW_1_B,\
                        ROW_2_B,\
@@ -83,4 +89,5 @@ class ButtonLabels:
                        ROW_5_B,\
                        ROW_6_B,\
                        ROW_7_B)
+
 

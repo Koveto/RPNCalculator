@@ -164,3 +164,4 @@ class GpioLcd(LcdApi):
         self.d4_pin.value(nibble & 0x01)
         self.hal_pulse_enable()
 
+
