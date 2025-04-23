@@ -57,6 +57,10 @@ class ButtonLabels:
     RAD = "Radians"
     RADDEG = "Radians Degrees"
     RECPOL = "Rectangular Polar"
+    ROUND = "Round"
+    MEAN = "Mean"
+    GAMMA = "Gamma"
+    MODULUS = "Modulus"
     
     ROW_7_A = (SUM_PLUS,             RECIPROCAL,      SQRT,          LOGARITHM,       NATURAL_LOG,    SPLIT_COMPLEX_RECT)
     ROW_6_A = (STO,                  RCL,             ROLL,          SINE,            COSINE,         TANGENT)
@@ -76,9 +80,9 @@ class ButtonLabels:
     
     ROW_7_B = (SUM_MINUS,            POWER,           SQUARE,        POWER_OF_TEN,    EXPONENTIAL,               SPLIT_COMPLEX_POLAR)
     ROW_6_B = (COMPLEX_NUMBER,       PERCENT,         PI,            ARCSINE,         ARCCOSINE,                 ARCTANGENT)
-    ROW_5_B = (ENTER,                ENTER,           SWAP,          NEGATE,          SCIENTIFIC_NOTATION,       CLEAR)
-    ROW_4_B = (REAL,                 SEVEN,           EIGHT,         NINE,            DIVIDE,                    None)
-    ROW_3_B = (IMAG,                 FOUR,            FIVE,          SIX,             MULTIPLY,                  None)
+    ROW_5_B = (ENTER,                ENTER,           MEAN,          ROUND,           SCIENTIFIC_NOTATION,       CLEAR)
+    ROW_4_B = (REAL,                 SEVEN,           EIGHT,         NINE,            MODULUS,                   None)
+    ROW_3_B = (IMAG,                 FOUR,            FIVE,          SIX,             GAMMA,                     None)
     ROW_2_B = (ALTERNATE_FUNCTIONS,  ONE,             TWO,           THREE,           SUBTRACT,                  None)
     ROW_1_B = (RECPOL,               DEG,             RAD,           CONJUGATE,       ORIENT,                    None)
 

@@ -35,9 +35,9 @@ class InputHandler:
         unary_buttons = {b.SINE, b.COSINE, b.TANGENT, b.ARCSINE, b.ARCCOSINE, b.ARCTANGENT,
                          b.LOGARITHM, b.NATURAL_LOG, b.NEGATE, b.RECIPROCAL, b.EXPONENTIAL,
                          b.SQUARE, b.POWER_OF_TEN, b.CONJUGATE, b.SQRT, b.ABS, b.ANGLE,
-                         b.REAL, b.IMAG, b.DEG, b.RAD}
+                         b.REAL, b.IMAG, b.DEG, b.RAD, b.ROUND, b.GAMMA}
         binary_buttons = {b.ADD, b.SUBTRACT, b.MULTIPLY, b.DIVIDE, b.POWER,
-                          b.SCIENTIFIC_NOTATION, b.PERCENT}
+                          b.SCIENTIFIC_NOTATION, b.PERCENT, b.MODULUS}
         digit_buttons = {b.ZERO, b.ONE, b.TWO, b.THREE, b.FOUR, b.FIVE, b.SIX, b.SEVEN, b.EIGHT, b.NINE, b.E}
 
         try:
@@ -72,6 +72,8 @@ class InputHandler:
                 self.calculator.sum_function()
             elif button_label == b.SUM_MINUS:
                 self.calculator.sum_function(True)
+            elif button_label == b.MEAN:
+                self.calculator.mean()
 
             elif button_label == b.PI:
                 self.calculator.pi()

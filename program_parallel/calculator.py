@@ -306,6 +306,16 @@ class Calculator:
             self.handle_complex_number()
             
         self.unary_operation(b.IMAG)
+        
+    def mean(self):
+        """
+        Calculates the mean of the stack. Pops, not peeks.
+        """
+        self._complete_input()
+        n = self.stack.size()
+        self.sum_function()
+        self.stack.push(float(n))
+        self.binary_operation(b.DIVIDE)
 
     def unary_operation(self, op):
         """
@@ -317,7 +327,7 @@ class Calculator:
                       "Power of Ten", "Square", "Sine", "Cosine", "Tangent",
                       "Arcsine", "Arccosine", "Arctangent", "Negate", "Reciprocal",
                       "Conjugate", "Sqrt", "Abs", "Angle", "Real", "Imag", 
-                      "Deg", "Rad"
+                      "Deg", "Rad", "Round", "Gamma"
         """
         if not self.input_in_progress and self.stack.is_empty():
             self.stack.push(0.0)
@@ -357,6 +367,19 @@ class Calculator:
             result = x * 180 / math.pi
         elif op == b.RAD:
             result = x * math.pi / 180
+        elif op == b.ROUND:
+            if (type(x) == complex):
+                re = round(x.real)
+                im = round(x.imag)
+                result = complex(re, im)
+            else:
+                result = float(round(x))
+        elif op == b.GAMMA:
+            if (type(x) != complex):
+                result = math.gamma(x)
+            else:
+                self.stack.push(x)
+                return
         elif op == b.NATURAL_LOG:
             if x == 0.0:
                 self.stack.push(x)
@@ -465,7 +488,7 @@ class Calculator:
         Args:
             op (str): A string representing the operation.
                       Valid operations are: "Add", "Subtract", "Multiply", "Divide", "Power", "Scientific Notation"
-                      "PERCENT.
+                      "Percent", "Modulus"
         """
         was_in_progress = self.input_in_progress
         self._complete_input()
@@ -499,6 +522,13 @@ class Calculator:
         elif op == b.PERCENT:
             result = y / (100*x)
             self.stack.push(y)
+        elif op == b.MODULUS:
+            if (type(y) != complex and
+                type(x) != complex):
+                result = math.fmod(y,x)
+            else:
+                self.stack.push(x)
+                return
 
         if result is not None:
             self.stack.push(result)
