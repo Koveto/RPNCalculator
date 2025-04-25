@@ -1,6 +1,6 @@
 """
 lcd.py
-3/2/2025 Kobe Goodwin
+4/25/2025 Kobe Goodwin
 
 Module for manipulating the LCD screen.
 """

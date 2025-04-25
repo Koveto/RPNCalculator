@@ -1,6 +1,7 @@
 """
 main.py
 Kobe Goodwin
+4/25/2025
 
 Initializes I/O, polls button input, interprets presses, updates LCD.
 """
@@ -51,23 +52,31 @@ def display_settings(lcd):
         lcd (LCD): The display being written to
     """
     if (config.orient_top_bottom):
-        lcd.write_at(lcd.columns - 3, 3, "DEG" if config.degrees else "RAD")
+        lcd.write_at(lcd.columns - 3, 3, "Deg" if config.degrees else "Rad")
     else:
-        lcd.write_at(lcd.columns - 3, 0, "DEG" if config.degrees else "RAD")
+        lcd.write_at(lcd.columns - 3, 0, "Deg" if config.degrees else "Rad")
     if (config.orient_top_bottom):
-        lcd.write_at(lcd.columns - 7, 3, "POL" if config.polar else "REC")
+        lcd.write_at(lcd.columns - 8, 3, "Polr" if config.polar else "Rect")
     else:
-        lcd.write_at(lcd.columns - 7, 0, "POL" if config.polar else "REC")
+        lcd.write_at(lcd.columns - 8, 0, "Polr" if config.polar else "Rect")
+    if (config.orient_top_bottom):
+        lcd.write_at(lcd.columns - 12, 3, "Hex" if config.hexadecimal else "Dec")
+    else:
+        lcd.write_at(lcd.columns - 12, 0, "Hex" if config.hexadecimal else "Dec")
+    if (config.orient_top_bottom):
+        lcd.write_at(lcd.columns - 16, 3, "Sci" if config.scientific else "RPN")
+    else:
+        lcd.write_at(lcd.columns - 16, 0, "Sci" if config.scientific else "RPN")
     if (config.button_mode):
         if (config.orient_top_bottom):
-            lcd.write_at(lcd.columns - 11, 3, "2nd")
+            lcd.write_at(lcd.columns - 20, 3, "2nd")
         else:
-            lcd.write_at(lcd.columns - 11, 0, "2nd")
+            lcd.write_at(lcd.columns - 20, 0, "2nd")
     else:
         if (config.orient_top_bottom):
-            lcd.write_at(lcd.columns - 11, 3, "   ")
+            lcd.write_at(lcd.columns - 20, 3, "   ")
         else:
-            lcd.write_at(lcd.columns - 11, 0, "   ")
+            lcd.write_at(lcd.columns - 20, 0, "   ")
 
 def main():
     """
@@ -81,7 +90,6 @@ def main():
     handler = InputHandler(lcd)
     
     # Initial LCD output
-    lcd.write_at(0, 0, "D: 0")
     lcd.write_at(0, 1, "C: 0")
     lcd.write_at(0, 2, "B: 0")
     lcd.write_at(0, 3, "A: 0")

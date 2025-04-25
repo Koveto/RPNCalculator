@@ -1,11 +1,10 @@
 """
 input_handler.py
 Kobe Goodwin
+4/25/2025
 
 Contains the InputHandler class.
-
 Handles button press interpretation.
-
 Calls appropriate functions based on button labels.
 """
 
@@ -38,7 +37,9 @@ class InputHandler:
                          b.REAL, b.IMAG, b.DEG, b.RAD, b.ROUND, b.GAMMA}
         binary_buttons = {b.ADD, b.SUBTRACT, b.MULTIPLY, b.DIVIDE, b.POWER,
                           b.SCIENTIFIC_NOTATION, b.PERCENT, b.MODULUS}
-        digit_buttons = {b.ZERO, b.ONE, b.TWO, b.THREE, b.FOUR, b.FIVE, b.SIX, b.SEVEN, b.EIGHT, b.NINE, b.E}
+        digit_buttons = {b.ZERO, b.ONE, b.TWO, b.THREE, b.FOUR, b.FIVE, b.SIX, b.SEVEN,
+                         b.EIGHT, b.NINE, b.E, b.AHEX, b.BHEX, b.CHEX, b.DHEX, b.EHEX,
+                         b.FHEX}
 
         try:
             if button_label in digit_buttons:
@@ -90,6 +91,10 @@ class InputHandler:
                 config.polar = not config.polar
             elif button_label == b.ORIENT:
                 config.orient_top_bottom = not config.orient_top_bottom
+            elif button_label == b.HEXADECIMAL:
+                config.hexadecimal = not config.hexadecimal
+            elif button_label == b.SCIENTIFIC:
+                config.scientific = not config.scientific
                 
             if (button_label != b.ENTER and \
                 self.calculator.just_pressed_enter):
@@ -108,7 +113,7 @@ class InputHandler:
                 r = self.lcd.rows - 2
             else:
                 r = self.lcd.rows - 3
-            self.lcd.write_at(0, r, "Undefined error     ")
+            self.lcd.write_at(0, r, "Domain error        ")
             print(f"Error: {ue}")
         except Exception as e:
             if config.orient_top_bottom:

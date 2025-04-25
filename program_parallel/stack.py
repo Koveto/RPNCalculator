@@ -1,6 +1,6 @@
 """
 stack.py
-3/13/2025 Kobe Goodwin
+4/25/2025 Kobe Goodwin
 
 Last-in First-out (LIFO) container.
 """
@@ -74,6 +74,9 @@ class Stack:
         """
         Creates a Stack where other is on bottom
         
+        Args:
+            other (Stack): stack to add with
+        
         Returns:
             Stack: New stack with other on bottom
         """
@@ -82,6 +85,3 @@ class Stack:
         for i in self.stack:
             result.push(i)
         return result
-
-
-

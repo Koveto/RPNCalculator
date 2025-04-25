@@ -1,3 +1,11 @@
+"""
+button_labels.py
+Kobe Goodwin
+4/25/2025
+
+Button layout and labels
+"""
+
 class ButtonLabels:
     ALTERNATE_FUNCTIONS = "Alternate Functions"
     SWAP = "Swap"
@@ -61,6 +69,14 @@ class ButtonLabels:
     MEAN = "Mean"
     GAMMA = "Gamma"
     MODULUS = "Modulus"
+    HEXADECIMAL = "Hexadecimal"
+    SCIENTIFIC = "Scientific"
+    AHEX = "AHEX"
+    BHEX = "BHEX"
+    CHEX = "CHEX"
+    DHEX = "DHEX"
+    EHEX = "EHEX"
+    FHEX = "FHEX"
     
     ROW_7_A = (SUM_PLUS,             RECIPROCAL,      SQRT,          LOGARITHM,       NATURAL_LOG,    SPLIT_COMPLEX_RECT)
     ROW_6_A = (STO,                  RCL,             ROLL,          SINE,            COSINE,         TANGENT)
@@ -81,9 +97,9 @@ class ButtonLabels:
     ROW_7_B = (SUM_MINUS,            POWER,           SQUARE,        POWER_OF_TEN,    EXPONENTIAL,               SPLIT_COMPLEX_POLAR)
     ROW_6_B = (COMPLEX_NUMBER,       PERCENT,         PI,            ARCSINE,         ARCCOSINE,                 ARCTANGENT)
     ROW_5_B = (ENTER,                ENTER,           MEAN,          ROUND,           SCIENTIFIC_NOTATION,       CLEAR)
-    ROW_4_B = (REAL,                 SEVEN,           EIGHT,         NINE,            MODULUS,                   None)
-    ROW_3_B = (IMAG,                 FOUR,            FIVE,          SIX,             GAMMA,                     None)
-    ROW_2_B = (ALTERNATE_FUNCTIONS,  ONE,             TWO,           THREE,           SUBTRACT,                  None)
+    ROW_4_B = (REAL,                 SEVEN,           HEXADECIMAL,   NINE,            MODULUS,                   None)
+    ROW_3_B = (IMAG,                 DHEX,            EHEX,          FHEX,            GAMMA,                     None)
+    ROW_2_B = (ALTERNATE_FUNCTIONS,  AHEX,            BHEX,          CHEX,            SCIENTIFIC,                None)
     ROW_1_B = (RECPOL,               DEG,             RAD,           CONJUGATE,       ORIENT,                    None)
 
     BUTTON_LABELS_B = (ROW_1_B,\

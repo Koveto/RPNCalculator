@@ -1,10 +1,10 @@
 """
 calculator.py
 Kobe Goodwin
+4/25/2025
 
-Calculator for performing arithmetic and trigonometric operations,
-including support for complex numbers, using an LCD display for
-output visualization.
+Keeps track of the stack and user input.
+Displays new output to screen.
 """
 
 import math
@@ -38,12 +38,10 @@ class Calculator:
 
         # Initialize LCD display
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, 0, "A: 0")
-            self.lcd.write_at(0, 1, "B: 0")
-            self.lcd.write_at(0, 2, "C: 0")
-            self.lcd.write_at(0, 3, "D: 0") 
+            self.lcd.write_at(0, 1, "A: 0")
+            self.lcd.write_at(0, 2, "B: 0")
+            self.lcd.write_at(0, 3, "C: 0")
         else:
-            self.lcd.write_at(0, 0, "D: 0")
             self.lcd.write_at(0, 1, "C: 0")
             self.lcd.write_at(0, 2, "B: 0")
             self.lcd.write_at(0, 3, "A: 0")
@@ -125,12 +123,17 @@ class Calculator:
 
         Args:
             digit (str): A digit character ("0" to "9").
+                         Also could be "E" as in 5E-6.
+                         Also could be "AHEX"-"FHEX" for 10-15.
         """
         if (self.input_in_progress and
             digit == b.E and
             b.E in self.current_input):
             return
         if self.input_in_progress:
+            if (str(digit).endswith("HEX")):
+                digit = digit[0]
+                config.hexadecimal = True
             self.current_input += digit
         else:
             if self.current_input:
@@ -186,22 +189,18 @@ class Calculator:
         self.current_input = ""
         self.input_in_progress = False
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, self.lcd.rows - 4, "A: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, self.lcd.rows - 3, "B: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, self.lcd.rows - 2, "C: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, self.lcd.rows - 1, "D: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 3, "A: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 2, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 1, "C: 0" + (" " * (self.lcd.columns - 4)))
         else:
-            self.lcd.write_at(0, self.lcd.rows - 4, "D: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, self.lcd.rows - 3, "C: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, self.lcd.rows - 2, "B: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, self.lcd.rows - 1, "A: 0" + (" " * (self.lcd.columns - 4)))
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, 0, "A: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, 1, "B: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, 2, "C: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, 3, "D: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 1, "A: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 2, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 3, "C: 0" + (" " * (self.lcd.columns - 4)))
         else:
-            self.lcd.write_at(0, 0, "D: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, 1, "C: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, 2, "B: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, 3, "A: 0" + (" " * (self.lcd.columns - 4)))
@@ -353,6 +352,10 @@ class Calculator:
         if (((op == b.ARCSINE) or (op == b.ARCCOSINE)) and \
             ((self.stack.peek() > 1) or (self.stack.peek() < -1))):
             raise UndefinedError("Domain error asin/acos")
+        
+        if (type(self.stack.peek()) == complex or \
+            self.stack.peek() <= 0):
+            raise UndefinedError("Domain error gamma")
         
         
         
@@ -605,7 +608,6 @@ class Calculator:
         
         Args:
             cnum (complex): The complex number to format.
-            config: Configuration object containing the 'polar' boolean attribute.
             
         Returns:
             str: The formatted string representing the complex number.
@@ -624,14 +626,15 @@ class Calculator:
         result += ' ' * (self.lcd.columns - 3 - len(result))
         
         return result
-
-    
     
     def _complete_input(self):
         if self.input_in_progress:
             if self.current_input[-1] == "E":
                 self.current_input = self.current_input[:len(self.current_input) - 1]
-            self.stack.push(float(self.current_input))
+            n = self.current_input
+            if (config.hexadecimal):
+                n = int(n, 16)
+            self.stack.push(float(n))
             self.current_input = ""
             self.input_in_progress = False
     
@@ -671,25 +674,16 @@ class Calculator:
         else:
             c_display = f"C: {c_value:.8g}"  # Use general format for large/small numbers
             c_display += ' ' * (self.lcd.columns - len(c_display))
-        if isinstance(d_value, complex):
-            # Format complex number for display
-            d_display = "D: " + self.format_complex_number(d_value)
-        else:
-            d_display = f"D: {d_value:.8g}"  # Use general format for large/small numbers
-            d_display += ' ' * (self.lcd.columns - len(d_display))
-        d_display = d_display[:11]
 
         a_display += ' ' * (self.lcd.columns - len(a_display))
         
         
         # Write to the LCD
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, 0, a_display)
-            self.lcd.write_at(0, 1, b_display)
-            self.lcd.write_at(0, 2, c_display)
-            self.lcd.write_at(0, 3, d_display)
+            self.lcd.write_at(0, 1, a_display)
+            self.lcd.write_at(0, 2, b_display)
+            self.lcd.write_at(0, 3, c_display)
         else:
-            self.lcd.write_at(0, 0, d_display)
             self.lcd.write_at(0, 1, c_display)
             self.lcd.write_at(0, 2, b_display)
             self.lcd.write_at(0, 3, a_display)
