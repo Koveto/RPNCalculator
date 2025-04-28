@@ -1,7 +1,7 @@
 """
 main.py
 Kobe Goodwin
-4/25/2025
+4/28/2025
 
 Initializes I/O, polls button input, interprets presses, updates LCD.
 """
@@ -109,9 +109,9 @@ def main():
                 if (config.button_mode):
                     new_buttons = ButtonLabels.BUTTON_LABELS_A
                     if (config.orient_top_bottom):
-                        lcd.write_at(lcd.columns - 7, 3, "   ")
+                        lcd.write_at(lcd.columns - 20, 3, "   ")
                     else:
-                        lcd.write_at(lcd.columns - 7, 0, "   ")
+                        lcd.write_at(lcd.columns - 3, 0, "   ")
                 else:
                     new_buttons = ButtonLabels.BUTTON_LABELS_B
                 config.button_mode = not config.button_mode

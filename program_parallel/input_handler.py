@@ -1,7 +1,7 @@
 """
 input_handler.py
 Kobe Goodwin
-4/25/2025
+4/28/2025
 
 Contains the InputHandler class.
 Handles button press interpretation.
@@ -91,6 +91,7 @@ class InputHandler:
                 config.polar = not config.polar
             elif button_label == b.ORIENT:
                 config.orient_top_bottom = not config.orient_top_bottom
+                self.lcd.write_at(0,0," "*80)
             elif button_label == b.HEXADECIMAL:
                 config.hexadecimal = not config.hexadecimal
             elif button_label == b.SCIENTIFIC:

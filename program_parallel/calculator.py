@@ -1,7 +1,7 @@
 """
 calculator.py
 Kobe Goodwin
-4/25/2025
+4/28/2025
 
 Keeps track of the stack and user input.
 Displays new output to screen.
@@ -38,9 +38,9 @@ class Calculator:
 
         # Initialize LCD display
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, 1, "A: 0")
-            self.lcd.write_at(0, 2, "B: 0")
-            self.lcd.write_at(0, 3, "C: 0")
+            self.lcd.write_at(0, 0, "A: 0")
+            self.lcd.write_at(0, 1, "B: 0")
+            self.lcd.write_at(0, 2, "C: 0")
         else:
             self.lcd.write_at(0, 1, "C: 0")
             self.lcd.write_at(0, 2, "B: 0")
@@ -130,10 +130,10 @@ class Calculator:
             digit == b.E and
             b.E in self.current_input):
             return
+        if (str(digit).endswith("HEX")):
+            digit = digit[0]
+            config.hexadecimal = True
         if self.input_in_progress:
-            if (str(digit).endswith("HEX")):
-                digit = digit[0]
-                config.hexadecimal = True
             self.current_input += digit
         else:
             if self.current_input:
@@ -166,12 +166,16 @@ class Calculator:
         Finalizes the current input, pushes it to the stack, and updates
         the LCD display.
         """
+        self.input_in_progress = False
         if self.current_input:
             try:
                 if self.current_input == "1E":
                     self.current_input = "1"
-                self.stack.push(float(self.current_input))
-                self.stack.push(float(self.current_input))
+                n = self.current_input
+                if (config.hexadecimal):
+                    n = int(n, 16)
+                self.stack.push(float(n))
+                self.stack.push(float(n))
             except ValueError:
                 self.current_input = ""
                 return
@@ -179,7 +183,6 @@ class Calculator:
         elif not self.stack.is_empty():
             self.stack.push(self.stack.peek())
         
-        self.input_in_progress = False
 
     def clear_display(self):
         """
@@ -189,17 +192,17 @@ class Calculator:
         self.current_input = ""
         self.input_in_progress = False
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, self.lcd.rows - 3, "A: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, self.lcd.rows - 2, "B: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, self.lcd.rows - 1, "C: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 2, "A: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 1, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, self.lcd.rows - 0, "C: 0" + (" " * (self.lcd.columns - 4)))
         else:
             self.lcd.write_at(0, self.lcd.rows - 3, "C: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, self.lcd.rows - 2, "B: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, self.lcd.rows - 1, "A: 0" + (" " * (self.lcd.columns - 4)))
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, 1, "A: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, 2, "B: 0" + (" " * (self.lcd.columns - 4)))
-            self.lcd.write_at(0, 3, "C: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 0, "A: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 1, "B: 0" + (" " * (self.lcd.columns - 4)))
+            self.lcd.write_at(0, 2, "C: 0" + (" " * (self.lcd.columns - 4)))
         else:
             self.lcd.write_at(0, 1, "C: 0" + (" " * (self.lcd.columns - 4)))
             self.lcd.write_at(0, 2, "B: 0" + (" " * (self.lcd.columns - 4)))
@@ -353,8 +356,9 @@ class Calculator:
             ((self.stack.peek() > 1) or (self.stack.peek() < -1))):
             raise UndefinedError("Domain error asin/acos")
         
-        if (type(self.stack.peek()) == complex or \
-            self.stack.peek() <= 0):
+        if ((type(self.stack.peek()) == complex or \
+            self.stack.peek() <= 0) and
+            (op == b.GAMMA)):
             raise UndefinedError("Domain error gamma")
         
         
@@ -628,6 +632,9 @@ class Calculator:
         return result
     
     def _complete_input(self):
+        """
+        The input in progress is now complete. Push to stack!
+        """
         if self.input_in_progress:
             if self.current_input[-1] == "E":
                 self.current_input = self.current_input[:len(self.current_input) - 1]
@@ -637,52 +644,147 @@ class Calculator:
             self.stack.push(float(n))
             self.current_input = ""
             self.input_in_progress = False
-    
-    def update_display(self):
+            
+    def _get_values(self):
         """
-        Updates the LCD display based on the current state.
+        Retrieve top 3 values from stack
         """
         if self.input_in_progress:
             a_value = self.current_input
+            b_value = self.stack.stack[-1] if self.stack.size() > 0 else 0.0000
+            c_value = self.stack.stack[-2] if self.stack.size() > 1 else 0.0000
+        else:
+            a_value = self.stack.peek() if not self.stack.is_empty() else 0.0000
+            b_value = self.stack.stack[-2] if self.stack.size() > 1 else 0.0000
+            c_value = self.stack.stack[-3] if self.stack.size() > 2 else 0.0000
+        return a_value, b_value, c_value
+    
+    def _get_a_display(self, a_value):
+        """
+        Build string to display on A row
+        """
+        if self.input_in_progress:
             if len(a_value) > self.lcd.columns - 4:  # Adjusting for "..." and "_"
                 a_display = "..." + a_value[-(self.lcd.columns - 4):] + "_"
             else:
                 a_display = f"A: {a_value}_"
-            b_value = self.stack.stack[-1] if self.stack.size() > 0 else 0.0000
-            c_value = self.stack.stack[-2] if self.stack.size() > 1 else 0.0000
-            d_value = self.stack.stack[-3] if self.stack.size() > 2 else 0.0000
         else:
-            a_value = self.stack.peek() if not self.stack.is_empty() else "0.0000"
             if isinstance(a_value, complex):
                 # Format complex number for display
                 a_display = "A: " + self.format_complex_number(a_value)
             else:
-                a_display = f"A: {float(a_value):.8g}"  # Use general format for large/small numbers
-            b_value = self.stack.stack[-2] if self.stack.size() > 1 else 0.0000
-            c_value = self.stack.stack[-3] if self.stack.size() > 2 else 0.0000
-            d_value = self.stack.stack[-4] if self.stack.size() > 3 else 0.0000
+                a_display = f"A: {float(a_value):.8g}"
+        a_display += ' ' * (self.lcd.columns - len(a_display))
+        return a_display
+    
+    def _get_a_display_hex(self, a_value):
+        """
+        Build string to display on A row while config.hexadecimal
+        """
+        def format_as_hex(value):
+            """Helper to convert and format numbers as hexadecimal."""
+            try:
+                return hex(round(value))[2:]
+            except TypeError:
+                return "Invalid"
 
+        if self.input_in_progress:
+            if len(str(a_value)) > self.lcd.columns - 4:  # Adjusting for "..." and "_"
+                a_display = "..." + str(a_value)[-(self.lcd.columns - 4):] + "_"
+            else:
+                a_display = f"A: {a_value}_"
+        else:
+            if isinstance(a_value, complex):
+                # Format complex number for display
+                real_part = format_as_hex(a_value.real)
+                imag_part = format_as_hex(a_value.imag)
+                a_display = f"A: {real_part} + {imag_part}i"
+            else:
+                try:
+                    # Format and round decimal values
+                    a_display = f"A: {format_as_hex(float(a_value))}"
+                except ValueError:
+                    a_display = "A: Invalid Input"
+
+        a_display += ' ' * (self.lcd.columns - len(a_display))
+        return a_display
+
+    
+    def _get_displays(self, b_value, c_value):
+        """
+        Build strings to display on B and C rows
+        """
         if isinstance(b_value, complex):
             # Format complex number for display
             b_display = "B: " + self.format_complex_number(b_value)
         else:
             b_display = f"B: {b_value:.8g}"  # Use general format for large/small numbers
-            b_display += ' ' * (self.lcd.columns - len(b_display))
+        b_display += ' ' * (self.lcd.columns - len(b_display))
         if isinstance(c_value, complex):
             # Format complex number for display
             c_display = "C: " + self.format_complex_number(c_value)
         else:
             c_display = f"C: {c_value:.8g}"  # Use general format for large/small numbers
-            c_display += ' ' * (self.lcd.columns - len(c_display))
+        c_display += ' ' * (self.lcd.columns - len(c_display))
+        return b_display, c_display
+    
+    def _get_displays_hex(self, b_value, c_value):
+        """
+        Build strings to display on B and C rows in hexadecimal format.
+        """
+        def format_as_hex(value):
+            """Helper to convert and format numbers as hexadecimal."""
+            try:
+                return hex(round(value))[2:]
+            except TypeError:
+                return "Invalid"
 
-        a_display += ' ' * (self.lcd.columns - len(a_display))
-        
+        if isinstance(b_value, complex):
+            # Format complex number for display
+            real_part_b = format_as_hex(b_value.real)
+            imag_part_b = format_as_hex(b_value.imag)
+            b_display = f"B: {real_part_b} + {imag_part_b}i"
+        else:
+            try:
+                # Format and round decimal values
+                b_display = f"B: {format_as_hex(float(b_value))}"
+            except ValueError:
+                b_display = "B: Invalid Input"
+        b_display += ' ' * (self.lcd.columns - len(b_display))
+
+        if isinstance(c_value, complex):
+            # Format complex number for display
+            real_part_c = format_as_hex(c_value.real)
+            imag_part_c = format_as_hex(c_value.imag)
+            c_display = f"C: {real_part_c} + {imag_part_c}i"
+        else:
+            try:
+                # Format and round decimal values
+                c_display = f"C: {format_as_hex(float(c_value))}"
+            except ValueError:
+                c_display = "C: Invalid Input"
+        c_display += ' ' * (self.lcd.columns - len(c_display))
+
+        return b_display, c_display
+
+    
+    def update_display(self):
+        """
+        Updates the LCD display based on the current state.
+        """
+        a_value, b_value, c_value = self._get_values()
+        if (config.hexadecimal):
+            a_display = self._get_a_display_hex(a_value)
+            b_display, c_display = self._get_displays_hex(b_value, c_value)
+        else:
+            a_display = self._get_a_display(a_value)
+            b_display, c_display = self._get_displays(b_value, c_value)
         
         # Write to the LCD
         if (config.orient_top_bottom):
-            self.lcd.write_at(0, 1, a_display)
-            self.lcd.write_at(0, 2, b_display)
-            self.lcd.write_at(0, 3, c_display)
+            self.lcd.write_at(0, 0, a_display)
+            self.lcd.write_at(0, 1, b_display)
+            self.lcd.write_at(0, 2, c_display)
         else:
             self.lcd.write_at(0, 1, c_display)
             self.lcd.write_at(0, 2, b_display)

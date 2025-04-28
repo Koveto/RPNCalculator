@@ -1,7 +1,7 @@
 """
 button_labels.py
 Kobe Goodwin
-4/25/2025
+4/28/2025
 
 Button layout and labels
 """
@@ -71,12 +71,12 @@ class ButtonLabels:
     MODULUS = "Modulus"
     HEXADECIMAL = "Hexadecimal"
     SCIENTIFIC = "Scientific"
-    AHEX = "AHEX"
-    BHEX = "BHEX"
-    CHEX = "CHEX"
-    DHEX = "DHEX"
-    EHEX = "EHEX"
-    FHEX = "FHEX"
+    AHEX = "aHEX"
+    BHEX = "bHEX"
+    CHEX = "cHEX"
+    DHEX = "dHEX"
+    EHEX = "eHEX"
+    FHEX = "fHEX"
     
     ROW_7_A = (SUM_PLUS,             RECIPROCAL,      SQRT,          LOGARITHM,       NATURAL_LOG,    SPLIT_COMPLEX_RECT)
     ROW_6_A = (STO,                  RCL,             ROLL,          SINE,            COSINE,         TANGENT)
