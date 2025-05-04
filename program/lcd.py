@@ -1,6 +1,10 @@
 """
 lcd.py
+<<<<<<< HEAD:program/lcd.py
 4/29/2025 Kobe Goodwin
+=======
+4/25/2025 Kobe Goodwin
+>>>>>>> fda07ff5f52634aca81e06061b32d6d8e8982986:program_parallel/lcd.py
 
 Module for manipulating the LCD screen.
 """
