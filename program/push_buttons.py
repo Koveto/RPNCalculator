@@ -1,6 +1,6 @@
 """
 push_buttons.py
-2/25/2025 Kobe Goodwin
+4/29/2025 Kobe Goodwin
 
 Module for reading input from a push button array.
 """
@@ -16,7 +16,9 @@ class PushButtons:
         Args:
             rowPinNos (list): List of pin numbers for rows.
             colPinNos (list): List of pin numbers for columns.
-            buttonList (list): Nested list of string identifiers for each button.
+        
+        Returns:
+            Instance of PushButtons
         """
         self.row_list = [Pin(pin, Pin.OUT) for pin in rowPinNos]
         self.col_list = [Pin(pin, Pin.IN, Pin.PULL_UP) for pin in colPinNos]
@@ -29,6 +31,13 @@ class PushButtons:
     def set_key_list(self, key_list):
         """
         Mutator for key list. See button_labels.py
+        
+        Args:
+            key_list (list): Nested list of string identifiers for each button
+                             See button_labels.py
+        
+        Returns:
+            None
         """
         self.key_list = key_list
 
@@ -37,7 +46,8 @@ class PushButtons:
         Scans the button array and returns the identifier of the pressed button.
 
         Returns:
-            str: The identifier of the pressed button, or None if no button is pressed.
+            str: The identifier of the pressed button
+                 None if no button is pressed.
         """
         for row in self.row_list:
             row.value(0)  # Set the current row to low
@@ -48,3 +58,5 @@ class PushButtons:
                 return button
             row.value(1)
         return None
+
+

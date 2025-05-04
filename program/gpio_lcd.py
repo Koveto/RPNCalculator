@@ -13,7 +13,7 @@ class GpioLcd(LcdApi):
     def __init__(self, rs_pin, enable_pin, d0_pin=None, d1_pin=None,
                  d2_pin=None, d3_pin=None, d4_pin=None, d5_pin=None,
                  d6_pin=None, d7_pin=None, rw_pin=None, backlight_pin=None,
-                 num_lines=2, num_columns=16):
+                 num_lines=4, num_columns=20):
         """Constructs the GpioLcd object. All of the arguments must be machine.Pin
         objects which describe which pin the given line from the LCD is
         connected to.
@@ -163,3 +163,5 @@ class GpioLcd(LcdApi):
         self.d5_pin.value(nibble & 0x02)
         self.d4_pin.value(nibble & 0x01)
         self.hal_pulse_enable()
+
+

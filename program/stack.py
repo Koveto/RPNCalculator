@@ -1,6 +1,6 @@
 """
 stack.py
-2/13/2025 Kobe Goodwin
+4/29/2025 Kobe Goodwin
 
 Last-in First-out (LIFO) container.
 """
@@ -9,6 +9,9 @@ class Stack:
     def __init__(self):
         """
         Initializes an empty stack.
+        
+        Returns:
+            Instance of Stack
         """
         self.stack = []
 
@@ -17,7 +20,10 @@ class Stack:
         Pushes an object to the top of the stack.
 
         Args:
-            o (object): The object to push onto the stack.
+            o: The object to push onto the stack.
+            
+        Returns:
+            None
         """
         self.stack.append(o)
 
@@ -26,7 +32,8 @@ class Stack:
         Returns the object at the top of the stack without removing it.
 
         Returns:
-            object: The object at the top of the stack, or None if the stack is empty.
+            The object at the top of the stack
+            None if the stack is empty.
         """
         if self.stack:
             return self.stack[-1]
@@ -37,18 +44,20 @@ class Stack:
         Removes and returns the object at the top of the stack.
 
         Returns:
-            object: The object at the top of the stack, or None if the stack is empty.
+            The object at the top of the stack
+            None if the stack is empty.
         """
         if self.stack:
             return self.stack.pop()
-        return None
+        return 0.0
 
     def is_empty(self):
         """
         Checks if the stack is empty.
 
         Returns:
-            bool: True if the stack is empty, False otherwise.
+            bool: True if the stack is empty
+                  False if the stack is not empty
         """
         return len(self.stack) == 0
 
@@ -69,4 +78,23 @@ class Stack:
             str: The stack as a string
         """
         return str(self.stack)
+
+    def __add__(self, other):
+        """
+        Creates a Stack where other is on bottom
+        Ex. [0] + [1] = [1, 0]. 0 is on TOP.
+        
+        Args:
+            other (Stack): stack to add with
+        
+        Returns:
+            Stack: New stack with other on bottom
+        """
+        result = Stack()
+        result.push(other)
+        for i in self.stack:
+            result.push(i)
+        return result
+
+
 

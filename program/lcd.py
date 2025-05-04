@@ -1,6 +1,6 @@
 """
 lcd.py
-3/2/2025 Kobe Goodwin
+4/29/2025 Kobe Goodwin
 
 Module for manipulating the LCD screen.
 """
@@ -22,14 +22,28 @@ class LCD:
             D5 (int): Pin number used for D5
             D6 (int): Pin number used for D6
             D7 (int): Pin number used for D7
+        
+        Returns:
+            Instance of LCD
         """
-        self.lcd = GpioLcd(RS, EN, D4, D5, D6, D7, row, col)
+        self.lcd = GpioLcd(Pin(RS), Pin(EN),
+                           d4_pin=Pin(D4),
+                           d5_pin=Pin(D5),
+                           d6_pin=Pin(D6),
+                           d7_pin=Pin(D7),
+                           num_lines=row,
+                           num_columns=col)
         self.rows = row
         self.columns = col
         self.clear()
 
     def clear(self):
-        """Clears the LCD display."""
+        """
+        Clears the LCD display.
+        
+        Returns:
+            None
+        """
         self.lcd.clear()
 
     def write_at(self, x, y, string):
@@ -37,16 +51,15 @@ class LCD:
         Writes a string at the specified (x, y) position on the LCD display.
 
         Args:
-            x (int): X cursor position.
-            y (int): Y cursor position.
+            x (int):      X cursor position.
+            y (int):      Y cursor position.
             string (str): String containing the message to display.
-
-        Raises:
-            ValueError: If x or y is out of bounds for the LCD dimensions.
+            
+        Returns:
+            None
         """
-        if not (0 <= x < self.columns and 0 <= y < self.rows):
-            raise ValueError(f"Position ({x}, {y}) is out of bounds for the LCD dimensions.")
-
         self.lcd.move_to(x, y)
         self.lcd.putstr(string)
+
+
 
