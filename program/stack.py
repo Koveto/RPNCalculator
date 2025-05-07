@@ -1,10 +1,6 @@
 """
 stack.py
-<<<<<<< HEAD:program/stack.py
 4/29/2025 Kobe Goodwin
-=======
-4/25/2025 Kobe Goodwin
->>>>>>> fda07ff5f52634aca81e06061b32d6d8e8982986:program_parallel/stack.py
 
 Last-in First-out (LIFO) container.
 """
@@ -86,10 +82,7 @@ class Stack:
     def __add__(self, other):
         """
         Creates a Stack where other is on bottom
-<<<<<<< HEAD:program/stack.py
         Ex. [0] + [1] = [1, 0]. 0 is on TOP.
-=======
->>>>>>> fda07ff5f52634aca81e06061b32d6d8e8982986:program_parallel/stack.py
         
         Args:
             other (Stack): stack to add with
@@ -101,11 +94,8 @@ class Stack:
         result.push(other)
         for i in self.stack:
             result.push(i)
-<<<<<<< HEAD:program/stack.py
         return result
 
 
 
-=======
-        return result
->>>>>>> fda07ff5f52634aca81e06061b32d6d8e8982986:program_parallel/stack.py
+

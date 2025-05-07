@@ -1,7 +1,7 @@
 """
 calculator.py
 Kobe Goodwin
-4/30/2025
+5/6/2025
 
 Keeps track of the stack and user input.
 Displays new output to screen.
@@ -47,14 +47,20 @@ class Calculator:
         self.input_in_progress = False
         self.store = [0.0]*6
         self.just_pressed_enter = False
-        if (config.orient_top_bottom):
-            self.lcd.write_at(0, 0, "X: 0")
-            self.lcd.write_at(0, 1, "Y: 0")
-            self.lcd.write_at(0, 2, "Z: 0")
-        else:
-            self.lcd.write_at(0, 1, "Z: 0")
-            self.lcd.write_at(0, 2, "Y: 0")
-            self.lcd.write_at(0, 3, "X: 0")
+        if ((lcd.rows == 4) and \
+            (lcd.columns == 20)):
+            if (config.orient_top_bottom):
+                self.lcd.write_at(0, 0, "X: 0")
+                self.lcd.write_at(0, 1, "Y: 0")
+                self.lcd.write_at(0, 2, "Z: 0")
+            else:
+                self.lcd.write_at(0, 1, "Z: 0")
+                self.lcd.write_at(0, 2, "Y: 0")
+                self.lcd.write_at(0, 3, "X: 0")
+        elif ((lcd.rows == 2) and \
+              (lcd.columns == 16)):
+            self.lcd.write_at(0, 0, "Y: 0")
+            self.lcd.write_at(0, 1, "X: 0")
         
     def roll(self):
         """
@@ -125,7 +131,6 @@ class Calculator:
             contents = ",".join(["0"] * 6)
         values = contents.split(",")
         value = values[index]
-        print(value)
         if "j" in value:
             self.stack.push(self._str_to_complex(value))
         else:
@@ -173,6 +178,9 @@ class Calculator:
     def delete(self):
         """
         Pops the top number
+        
+        Returns:
+            None
         """
         self._complete_input()
         self.stack.pop()
@@ -324,14 +332,20 @@ class Calculator:
         self.stack = Stack()
         self.current_input = ""
         self.input_in_progress = False
-        if (config.orient_top_bottom):
-            self.lcd.write_at(0, 0, "X: 0" + (" " * (16)))
-            self.lcd.write_at(0, 1, "Y: 0" + (" " * (16)))
-            self.lcd.write_at(0, 2, "Z: 0" + (" " * (16)))
-        else:
-            self.lcd.write_at(0, 1, "Z: 0" + (" " * (16)))
-            self.lcd.write_at(0, 2, "Y: 0" + (" " * (16)))
-            self.lcd.write_at(0, 3, "X: 0" + (" " * (16)))
+        if ((self.lcd.rows == 4) and \
+            (self.lcd.columns == 20)):
+            if (config.orient_top_bottom):
+                self.lcd.write_at(0, 0, "X: 0" + (" " * (16)))
+                self.lcd.write_at(0, 1, "Y: 0" + (" " * (16)))
+                self.lcd.write_at(0, 2, "Z: 0" + (" " * (16)))
+            else:
+                self.lcd.write_at(0, 1, "Z: 0" + (" " * (16)))
+                self.lcd.write_at(0, 2, "Y: 0" + (" " * (16)))
+                self.lcd.write_at(0, 3, "X: 0" + (" " * (16)))
+        elif ((self.lcd.rows == 2) and \
+              (self.lcd.columns == 16)):
+            self.lcd.write_at(0, 0, "Y: 0" + (" " * (12)))
+            self.lcd.write_at(0, 1, "X: 0" + (" " * (12)))
 
     def delete_last_input(self):
         """
@@ -394,7 +408,7 @@ class Calculator:
             result = sum(temp_stack)  # Simply add all numbers if not subtracting
 
         # Rebuild the stack with the original elements
-        for value in temp_stack[::-1]:
+        for value in temp_stack:
             self.stack.push(value)
         
         # Push the result onto the stack
@@ -747,9 +761,9 @@ class Calculator:
         if (config.polar):
             if part2 < 0:
                 imag_part = imag_part[1:]
-                result = f"{real_part} < -{imag_part}"
+                result = f"{real_part} " + chr(0) + f" -{imag_part}"
             else:
-                result = f"{real_part} <  {imag_part}"
+                result = f"{real_part} " + chr(0) + f"  {imag_part}"
         else:
             if part2 < 0:
                 imag_part = imag_part[1:]
@@ -767,9 +781,9 @@ class Calculator:
 
             if (config.polar):
                 if part2 < 0:
-                    result = f"{real_part} < -{imag_part}"
+                    result = f"{real_part} " + chr(0) + f" -{imag_part}"
                 else:
-                    result = f"{real_part} <  {imag_part}"
+                    result = f"{real_part} " + chr(0) + f"  {imag_part}"
             else:
                 if part2 < 0:
                     result = f"{real_part} - j{imag_part}"
@@ -849,8 +863,8 @@ class Calculator:
             str: String to display on X row
         """
         if self.input_in_progress:
-            if len(x_value) > 20 - 4:  # Adjusting for "..." and "_"
-                x_display = "..." + x_value[-(20 - 4):] + "_"
+            if len(x_value) > self.lcd.columns - 4:  # Adjusting for "..." and "_"
+                x_display = "..." + x_value[-(self.lcd.columns - 4):] + "_"
             else:
                 x_display = f"X: {x_value}_"
         else:
@@ -858,8 +872,12 @@ class Calculator:
                 # Format complex number for display
                 x_display = "X: " + self.format_complex_number(x_value)
             else:
-                x_display = f"X: {float(x_value):.8g}"
-        x_display += ' ' * (20 - len(x_display))
+                if ((self.lcd.rows == 4) and \
+                    (self.lcd.columns == 20)):
+                    x_display = f"X: {float(x_value):.8g}"
+                else:
+                    x_display = f"X: {float(x_value):.4g}"
+        x_display += ' ' * (self.lcd.columns - len(x_display))
         return x_display
     
     def _get_x_display_hex(self, x_value):
@@ -873,8 +891,8 @@ class Calculator:
             str: String to display on X row
         """
         if self.input_in_progress:
-            if len(str(x_value)) > 20 - 4:  # Adjusting for "..." and "_"
-                x_display = "..." + str(x_value)[-(20 - 4):] + "_"
+            if len(str(x_value)) > self.lcd.columns - 4:  # Adjusting for "..." and "_"
+                x_display = "..." + str(x_value)[-(self.lcd.columns - 4):] + "_"
             else:
                 x_display = f"X: {x_value}_"
         else:
@@ -882,7 +900,10 @@ class Calculator:
                 # Format complex number for display
                 real_part = hex(round(x_value.real))[2:]
                 imag_part = hex(round(x_value.imag))[2:]
-                x_display = f"X: {real_part} + {imag_part}i"
+                plus_or_minus = "+"
+                if (x_value.imag < 0):
+                    plus_or_minus = "-"
+                x_display = f"X: {real_part} {plus_or_minus} j{imag_part}"
             else:
                 try:
                     # Format and round decimal values
@@ -891,7 +912,7 @@ class Calculator:
                 except ValueError:
                     x_display = "X: Invalid Input"
 
-        x_display += ' ' * (20 - len(x_display))
+        x_display += ' ' * (self.lcd.columns - len(x_display))
         return x_display
 
     
@@ -910,13 +931,18 @@ class Calculator:
         if isinstance(y_value, complex):
             y_display = "Y: " + self.format_complex_number(y_value)
         else:
-            y_display = f"Y: {y_value:.8g}"
-        y_display += ' ' * (20 - len(y_display))
+            if ((self.lcd.rows == 4) and \
+                (self.lcd.columns == 20)):
+                y_display = f"Y: {y_value:.8g}"
+            elif ((self.lcd.rows == 2) and \
+                  (self.lcd.columns == 16)):
+                y_display = f"Y: {y_value:.4g}"
+        y_display += ' ' * (self.lcd.columns - len(y_display))
         if isinstance(z_value, complex):
             z_display = "Z: " + self.format_complex_number(z_value)
         else:
             z_display = f"Z: {z_value:.8g}"
-        z_display += ' ' * (20 - len(z_display))
+        z_display += ' ' * (self.lcd.columns - len(z_display))
         return y_display, z_display
     
     def _get_displays_hex(self, y_value, z_value):
@@ -944,7 +970,7 @@ class Calculator:
                 y_display = f"Y: {y}"
             except ValueError:
                 y_display = "Y: Invalid Input"
-        y_display += ' ' * (20 - len(y_display))
+        y_display += ' ' * (self.lcd.columns - len(y_display))
 
         if isinstance(z_value, complex):
             real_part_z = hex(round(z_value.real))[2:]
@@ -959,7 +985,7 @@ class Calculator:
                 z_display = f"Z: {z}"
             except ValueError:
                 c_display = "Z: Invalid Input"
-        z_display += ' ' * (20 - len(z_display))
+        z_display += ' ' * (self.lcd.columns - len(z_display))
 
         return y_display, z_display
 
@@ -980,22 +1006,36 @@ class Calculator:
             y_display, z_display = self._get_displays(y_value, z_value)
         
         # Write to the LCD
-        if (config.orient_top_bottom):
-            self.lcd.write_at(0, 0, x_display)
-            self.lcd.write_at(0, 1, y_display)
-            self.lcd.write_at(0, 2, z_display)
-        else:
-            self.lcd.write_at(0, 1, z_display)
-            self.lcd.write_at(0, 2, y_display)
-            self.lcd.write_at(0, 3, x_display)
+        if ((self.lcd.rows == 4) and \
+            (self.lcd.columns == 20)):
+            if (config.orient_top_bottom):
+                self.lcd.write_at(0, 0, x_display)
+                self.lcd.write_at(0, 1, y_display)
+                self.lcd.write_at(0, 2, z_display)
+            else:
+                self.lcd.write_at(0, 1, z_display)
+                self.lcd.write_at(0, 2, y_display)
+                self.lcd.write_at(0, 3, x_display)
+        elif ((self.lcd.rows == 2) and \
+              (self.lcd.columns == 16)):
+            self.lcd.write_at(0, 0, y_display)
+            self.lcd.write_at(0, 1, x_display)
         
         if (config.storing or config.recalling):
-            if (config.orient_top_bottom):
+            if (config.orient_top_bottom or \
+                (self.lcd.rows == 2)):
                 row1 = 0
                 row2 = 1
             else:
                 row1 = 3
                 row2 = 2
-            self.lcd.write_at(0, row1, " A  B  C  D  E  F   ")
-            self.lcd.write_at(0, row2, "Press top row button")
+            if ((self.lcd.rows == 4) and \
+                (self.lcd.columns == 20)):
+                self.lcd.write_at(0, row1, " A  B  C  D  E  F   ")
+                self.lcd.write_at(0, row2, "Press top row button")
+            elif ((self.lcd.rows == 2) and \
+                  (self.lcd.columns == 16)):
+                self.lcd.write_at(0, row1, "A  B  C  D  E  F")
+                self.lcd.write_at(0, row2, "Top row button: ")
                 
+

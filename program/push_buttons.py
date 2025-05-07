@@ -1,10 +1,6 @@
 """
 push_buttons.py
-<<<<<<< HEAD:program/push_buttons.py
 4/29/2025 Kobe Goodwin
-=======
-4/25/2025 Kobe Goodwin
->>>>>>> fda07ff5f52634aca81e06061b32d6d8e8982986:program_parallel/push_buttons.py
 
 Module for reading input from a push button array.
 """
@@ -62,5 +58,6 @@ class PushButtons:
                 return button
             row.value(1)
         return None
+
 
 

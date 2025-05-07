@@ -140,19 +140,38 @@ class InputHandler:
                 r = self.lcd.rows - 2
             else:
                 r = self.lcd.rows - 3
-            self.lcd.write_at(0, r, "Divide by zero error")
+            if ((self.lcd.rows == 4) and \
+                (self.lcd.columns == 20)):
+                self.lcd.write_at(0, r, "Divide by zero error")
+            elif ((self.lcd.rows == 2) and \
+                  (self.lcd.columns == 16)):
+                r = 0
+                self.lcd.write_at(0, r, "   Divide by 0  ")
             print(f"Error: {zde}")
         except UndefinedError as ue:
             if config.orient_top_bottom:
                 r = self.lcd.rows - 2
             else:
                 r = self.lcd.rows - 3
-            self.lcd.write_at(0, r, "Domain error        ")
+            if ((self.lcd.rows == 4) and \
+                (self.lcd.columns == 20)):
+                self.lcd.write_at(0, r, "Domain error        ")
+            elif ((self.lcd.rows == 2) and \
+                  (self.lcd.columns == 16)):
+                r = 0
+                self.lcd.write_at(0, r, "Domain error    ")
             print(f"Error: {ue}")
         except Exception as e:
             if config.orient_top_bottom:
                 r = self.lcd.rows - 2
             else:
                 r = self.lcd.rows - 3
-            self.lcd.write_at(0, r, "ERROR!              ")
+            if ((self.lcd.rows == 4) and \
+                (self.lcd.columns == 20)):
+                self.lcd.write_at(0, r, "ERROR!              ")
+            elif ((self.lcd.rows == 2) and \
+                  (self.lcd.columns == 16)):
+                r = 0
+                self.lcd.write_at(0, r, "ERROR!              ")
             print(f"Error: {e}")
+
