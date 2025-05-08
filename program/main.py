@@ -1,12 +1,12 @@
 """
 main.py
 Kobe Goodwin
-5/7/2025
+5/8/2025
 
 Initializes I/O, polls button input, interprets presses, updates LCD.
 """
 
-from lcd_i2c import LCD_I2C
+#from lcd_i2c import LCD_I2C
 from lcd import LCD
 from push_buttons import PushButtons
 from input_handler import InputHandler
