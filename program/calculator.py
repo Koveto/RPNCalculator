@@ -1039,3 +1039,5 @@ class Calculator:
                 self.lcd.write_at(0, row2, "Top row button: ")
                 
 
+
+

@@ -175,3 +175,5 @@ class InputHandler:
                 self.lcd.write_at(0, r, "ERROR!              ")
             print(f"Error: {e}")
 
+
+

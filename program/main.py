@@ -6,6 +6,7 @@ Kobe Goodwin
 Initializes I/O, polls button input, interprets presses, updates LCD.
 """
 
+from lcd_i2c import LCD_I2C
 from lcd import LCD
 from push_buttons import PushButtons
 from input_handler import InputHandler
@@ -22,10 +23,8 @@ D4 = 19
 D5 = 18
 D6 = 17
 D7 = 16
-# COLUMNS = 16
-# ROWS = 2
-# SDA = 0
-# SCL = 1
+SDA = 0
+SCL = 1
 ANGLE    = [0x00, 0x01, 0x03, 0x06, 0x0C, 0x18, 0x1F, 0x00]
 PI       = [0x00, 0x00, 0x1F, 0x0A, 0x0A, 0x0A, 0x0B, 0x00]
 SQUARE   = [0x03, 0x05, 0x01, 0x02, 0x07, 0x00, 0x00, 0x00]
@@ -117,7 +116,7 @@ def main():
     """
     # Initialize I/O
     lcd = LCD(RS, EN, D4, D5, D6, D7)
-    #lcd = LCD(COLUMNS, ROWS, SDA, SCL)
+    #lcd = LCD_I2C(SDA, SCL)
     buttons = PushButtons(BUTTON_ROWS, BUTTON_COLS)
     handler = InputHandler(lcd)
     
@@ -185,6 +184,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
 
 
 
